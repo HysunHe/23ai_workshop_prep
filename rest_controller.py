@@ -94,8 +94,8 @@ def insert_one_document(client: Connection, table_name: str, dataset_name: str, 
 
 @_app.post(f"{os.environ.get("CONTEXT_ROOT")}/prepare-data")
 def prepare_data(
-    table_name: str = Body(default="lab_vecstore", examples=["lab_vecstore_hysun", "lab_vecstore_david"]),
-    dataset_name: list = Body(examples=["oracledb_docs", "mylab_test_data"]),
+    table_name: str = Body(examples=["lab_vecstore_<your_name>", "lab_vecstore_david"]),
+    dataset_name: str = Body(examples=["oracledb_docs", "mylab_test_data"]),
 ) -> Response:
     print(f"# Got prepare_data request: {table_name} - {dataset_name}")
 
