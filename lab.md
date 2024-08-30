@@ -26,11 +26,16 @@ Oracle支持的距离策略主要有：EUCLIDEAN, COSINE, DOT, HAMMING
 SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,6]'), EUCLIDEAN ) as distance;
 ```
 
+注：欧几里得距离是指连接这两点的线段的长度（二维空间中），上述 [2,2] 和 [5,6] 两点间的距离由勾股定理可直接算出为 5
+
+
 ### 利用余弦距离策略计算两个向量之间的距离
 
 ```sql
 SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,5]'), COSINE) as distance;
 ```
+
+注：余弦距离策略关注的是两个向量在方向上的一致性，上述 [2,2] 和 [5,5] 在方向上完全一致，因此，它们的距离为0，代表两个向量完全匹配。
 
 ## Oracle向量数据库基本操作
 
@@ -265,7 +270,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![1724926466173](image/lab/1724926466173.png)
 
-## 库内向量化
+## 库内向量化操作
 
 Oracle 数据库提供了库内向量化的特性，其允许用户导入向量嵌入模型到数据库中，然后可以直接在SQL中对数据进行向量化操作，无需依赖外部的程序，这种方式很大程序的简化了向量数据的加载和检索，非常方便。
 
@@ -312,7 +317,7 @@ WHERE MODEL_NAME = 'MYDOC_MODEL';
 SELECT VECTOR_EMBEDDING(mydoc_model USING 'Hello, World' as input) AS embedding;
 ```
 
-### 内向量化操作
+### 库内向量化及检索
 
 #### 准备数据
 
@@ -360,4 +365,4 @@ order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 2
 FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
-可以看到，库内检索是非常便捷的；但我们也应意识到，embedding 是一个比较消耗资源的操作，并且对模型的大小有一定的限制，因此具体应用时，需要权衡考虑。
+至此，我们已经完成了Oracle向量数据库的库内向量化操作。
