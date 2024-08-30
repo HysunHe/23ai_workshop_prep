@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cpu
+#--extra-index-url https://download.pytorch.org/whl/cpu
 sentence-transformers==3.0.1
 oracledb==2.2.1
 fastapi==0.111.0
@@ -10,3 +10,4 @@ oci==2.129.3
 langchain_community==0.2.9
 docx2txt==0.8
 langchain-huggingface==0.0.3
+#vllm==0.5.5

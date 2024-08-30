@@ -203,7 +203,6 @@ END;
 
 select * from user_objects where object_type = 'MINING MODEL';
 
-
 SELECT MODEL_NAME, MINING_FUNCTION, ALGORITHM, ALGORITHM_TYPE, MODEL_SIZE
 FROM USER_MINING_MODELS;
 
@@ -228,3 +227,18 @@ from lab_vecstore_hysun2
 where dataset_name='oracledb_docs'
 order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 23ai 新特性' as input), COSINE)
 FETCH APPROX FIRST 3 ROWS ONLY;
+
+
+
+vllm: https://www.hopsworks.ai/dictionary/vllm#:~:text=vLLM%20stands%20for%20Virtual%20Large,inferencing%20and%20model%20serving%20efficiently.
+
+curl http://150.230.37.250:8098/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "apikey: 123456" \
+    -d '{
+    "model": "Qwen2-7B-Instruct",
+    "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Tell me something about large language models."}
+    ]
+    }'

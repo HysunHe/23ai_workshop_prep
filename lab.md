@@ -28,7 +28,6 @@ SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,6]'), EUCLIDEAN ) as distanc
 
 注：欧几里得距离是指连接这两点的线段的长度（二维空间中），上述 [2,2] 和 [5,6] 两点间的距离由勾股定理可直接算出为 5
 
-
 ### 利用余弦距离策略计算两个向量之间的距离
 
 ```sql
@@ -366,3 +365,99 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
 至此，我们已经完成了Oracle向量数据库的库内向量化操作。
+
+## RAG
+
+本节将实验向量数据库的一个典型应用场景：RAG。在RAG的解决方案中，组件要素主要包括：大语言模型（LLM）、向量嵌入模型（embedding model）、向量数据库 以及 Rerank模型（非必要，根据实际情况可选，本实验不涉及Rerank模型）。
+
+本实验中我们通过对比 直接与大模型（LLM）对话 和 使用RAG的方式与LLM对话 两者生成结果的区别来直观的了解向量数据库在这种场景中的作用。
+
+### 大语言模型部署（仅讲师操作）
+
+大语言模型是生成式AI的关键部分。本实验中，我们将选用开源的通义千问模型：Qwen2-7B-Instruct
+
+考虑到硬件资源因素，本操作仅由讲师完成。
+
+#### 下载模型
+
+从魔搭社区 (modelscope) 下载：[Qwen2-7B-Instruct](https://www.modelscope.cn/models/qwen/Qwen2-7B-Instruct)
+
+#### 部署模型
+
+我们采用vLLM来部署模型。vLLM是一个模型加速库，能大幅提升推理效率。
+
+安装 vLLM：
+
+```shell
+pip install vllm
+```
+
+启动运行：
+
+```shell
+ python -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048
+```
+
+#### 测试部署是否成功：
+
+```shell
+curl http://150.230.37.250:8098/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+    "model": "Qwen2-7B-Instruct",
+    "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Tell me something about large language models."}
+    ]
+    }'
+```
+
+### 直接与LLM对话（非RAG)
+
+```sql
+SET SERVEROUTPUT ON;
+
+declare
+    v_req       utl_http.req;
+    v_res       utl_http.resp;
+    jo          JSON_OBJECT_T;
+    ja          JSON_ARRAY_T;
+    l_resp      CLOB;
+    llm_result  CLOB;
+    v_buffer    varchar2(4000); 
+    v_body      varchar2(4000) := '{
+    "model": "Qwen2-7B-Instruct",
+    "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Tell me something about large language models."}
+    ]
+    }'; 
+begin
+    -- Set connection.
+    v_req := utl_http.begin_request('http://150.230.37.250:8098/v1/chat/completions', 'POST');
+    utl_http.set_header(v_req, 'content-type', 'application/json'); 
+    utl_http.set_header(v_req, 'Content-Length', length(v_body));
+    
+    -- Invoke REST API.
+    utl_http.write_text(v_req, v_body);
+  
+    -- Get response.
+    v_res := utl_http.get_response(v_req);
+    begin
+        loop
+            utl_http.read_line(v_res, v_buffer);
+            l_resp := l_resp || v_buffer;
+        end loop;
+        utl_http.end_response(v_res);
+    exception
+        when utl_http.end_of_body then
+            utl_http.end_response(v_res);
+    end;
+    
+    jo := JSON_OBJECT_T.parse(l_resp);
+    llm_result := JSON_OBJECT_T(jo.get_Array('choices').get(0)).get_Object('message').get_Clob('content');
+    
+    dbms_output.put_line(llm_result);
+end;
+/
+```
