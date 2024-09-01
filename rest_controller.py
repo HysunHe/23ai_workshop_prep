@@ -119,10 +119,10 @@ def prepare_data(
 
 @_app.post(f"{os.environ.get("CONTEXT_ROOT")}/embedding")
 def embedding_query(
-    query: QueryPara = Body(examples=["Oracle 23ai 新特性", "Oracle向量数据库是什么"])
+    query: QueryPara = Body(examples=[QueryPara(query="Oracle 23ai 新特性"), QueryPara(query="Oracle向量数据库是什么")])
 ) -> Response:
     print(f"# Got embedding_query request: {query}")
-
+    
     embedding = embedding_model.embed_query(text=query)
     
     resp: Response = Response(status="OK", message=f"Operation succeeded.", data={"embedding": embedding})
