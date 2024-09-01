@@ -14,7 +14,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.docstore.document import Document
-from JsonResponse import Response
+from MyTOs import Response, QueryPara
 
 from dotenv import load_dotenv
 load_dotenv("app.env")
@@ -119,7 +119,7 @@ def prepare_data(
 
 @_app.post(f"{os.environ.get("CONTEXT_ROOT")}/embedding")
 def embedding_query(
-    query: str = Body(examples=["Oracle 23ai 新特性", "Oracle向量数据库是什么"])
+    query: QueryPara = Body(examples=["Oracle 23ai 新特性", "Oracle向量数据库是什么"])
 ) -> Response:
     print(f"# Got embedding_query request: {query}")
 

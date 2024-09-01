@@ -242,3 +242,10 @@ curl http://150.230.37.250:8098/v1/chat/completions \
     {"role": "user", "content": "Tell me something about large language models."}
     ]
     }'
+
+
+   curl -X 'POST'
+     'http://<ip>:<port>/workshop/embedding'
+     -H 'accept: application/json'
+     -H 'Content-Type: application/json'
+     -d '"Oracle 23ai 新特性"'

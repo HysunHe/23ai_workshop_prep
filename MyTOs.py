@@ -12,6 +12,11 @@ from pydantic import BaseModel
 
 class Response(BaseModel):
     """DTO class"""
+
     status: str = pydantic.Field(..., description="status text")
     message: str = pydantic.Field(..., description="message text")
     data: dict = pydantic.Field(..., description="response data")
+
+
+class QueryPara(BaseModel):
+    query: str = pydantic.Field(..., description="query text")
