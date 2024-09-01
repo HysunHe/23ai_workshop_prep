@@ -19,4 +19,4 @@ class Response(BaseModel):
 
 
 class QueryPara(BaseModel):
-    query: str = pydantic.Field(..., description="query text")
+    text: str = pydantic.Field(..., description="query text")
