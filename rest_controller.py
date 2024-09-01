@@ -7,6 +7,7 @@ History:
 """
 
 import os
+import json
 import oracledb
 import load_utils
 from oracledb import Connection
@@ -125,7 +126,7 @@ def embedding_query(
     
     embedding = embedding_model.embed_query(text=query.text)
     
-    resp: Response = Response(status="OK", message=f"Operation succeeded.", data={"embedding": embedding})
+    resp: Response = Response(status="OK", message=f"Operation succeeded.", data={"embedding": json.dumps(embedding)})
     print(f"# {vars(resp)}")
     
     return resp
