@@ -177,11 +177,13 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 1. 文本向量化API（后续用到）
 
    ```shell
-   curl -X 'POST'
-     'http://<ip>:<port>/workshop/embedding'
-     -H 'accept: application/json'
-     -H 'Content-Type: application/json'
-     -d '"Oracle 23ai 新特性"'
+    curl -X 'POST' \
+    'http://<ip>:<port>/workshop/embedding' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "text": "Oracle 23ai 新特性"
+    }'
    ```
 2. 批量数据准备API（后续用到）
 
@@ -250,11 +252,13 @@ select count(*) from lab_vecstore_hysun;  -- 231 条
 第一步，先将要检索的文本在库外向量化。我们调用上述提供的API完成这一步。API将返回向量数据。
 
 ```shell
-   curl -X 'POST'
-     'http://<ip>:<port>/workshop/embedding'
-     -H 'accept: application/json'
-     -H 'Content-Type: application/json'
-     -d '"Oracle 23ai 新特性"'
+curl -X 'POST' \
+  'http://<ip>:<port>/workshop/embedding' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "text": "Oracle 23ai 新特性"
+}'
 ```
 
 第二步，执行 SQL 语句检索相似的数据，将上一步中返回的查询向量传入到VECTOR_DISTANCE函数中（请注意用自己的表名）：
