@@ -1,0 +1,4 @@
+问题： Exadata,升级,Exadata存储服务器和Exadata数据库服务器升级通常包含那些更新？
+解答： （1）Oracle Linux操作系统
+（2）Oracle Exadata系统软件
+（3）固件（例如：磁盘、闪存、RAID控制器、ILOM、HCA）

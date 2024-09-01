@@ -1,0 +1,2 @@
+问题： Exadata,升级,Exadata image升级对于集群和数据库版本有什么要求
+解答： Exadata不同版本的image对于集群和数据库版本要求不同，详见官方文档：https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmso/new-features.html#GUID-45D4D12A-C249-46B3-B698-FE176601674B

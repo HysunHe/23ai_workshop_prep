@@ -1,0 +1,9 @@
+问题： Oracle19c,补丁（Patch）,Oracle的补丁类型是什么？
+解答： 数据库版本12.1之前，包括11.2 等：
+CPU：全称是Critical Patch Update, Oracle每个季度都会发布一个安全补丁包，用于修复产品中的安全隐患。
+PSU：包含安全性修复和回归修复，如漏洞和bug fixes等，包括安全与安全无关与的关键补丁。
+注意：PSU是包括于关键补丁更新（CPU），但又不限于CPU。PSU通常和CPU一起发布。两者是累计的。最新的CPU和PSU补丁已经包含以往的补丁，所以只要安装最新的补丁即可。在安装之前，请仔细看readme文档。如果只是为修补漏洞，考虑到变动范围小，建议使用CPU补丁。
+
+数据库版本12.2之后，包括18C ，19C 等：
+RU ：2017 年 7 月开始，Oracle 对数据库和 GI(Grid Infrastructure) 12.2 及之后版本的主动修补程序进行了更改。Oracle 从 12.2 版本开始补丁不再使用 PSU、SPU 的称呼了， 取而代之的为 RU (Release Updates) 和 RUR (Release Update Revisions) 
+ 注意： 从19.17开始， Oracle 将停止发布更新修订 (RUR) ，每个版本更新 (RU) 将在发布后 6 个月内获得每月推荐补丁，Oracle将为每个RU提供6个MRP，建议使用RU补丁。

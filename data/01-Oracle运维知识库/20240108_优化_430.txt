@@ -1,0 +1,2 @@
+问题： Exadata,优化,如何估计 EHCC 压缩类型的压缩率？
+解答： 使用 dbms_compression.get_compression_ratio()。

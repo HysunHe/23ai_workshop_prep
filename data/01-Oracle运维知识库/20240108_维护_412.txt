@@ -1,0 +1,5 @@
+问题： Exadata,维护,我的 ASM 实例在尝试发现磁盘时挂起？
+解答： 通过 ASM 实例警报日志确认发现时挂起（而不是因其他原因挂起）。确认后，尝试 kfod 看看它是否也挂起。
+•	如果 kfod 挂起，请检查 libskgxp11.so 是否与所有 ORACLE_HOME（包括 CRS_HOME）中的 libskgxpr.so 具有相同的大小和校验和。如果没有，请重新链接 oracle 二进制文件与RDS。
+•	检查 cellinit.ora 和 cellip.ora 文件的正确性
+•	检查主从diskmon跟踪文件

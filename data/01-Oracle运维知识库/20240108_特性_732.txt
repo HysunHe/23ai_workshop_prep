@@ -1,0 +1,18 @@
+问题： ODA,特性,Oracle 数据库机 X9-2-HA建议安装哪些软件？
+解答： Oracle 软件
+■ Oracle Linux（预装）
+■ Oracle Linux KVM（预装，可选用）
+■ Appliance Manager（预装）
+Oracle 数据库软件（需单独购买许可）
+■ 根据需要的可用性级别选择 Oracle 数据库软件：
+− Oracle Database 21c 企业版、标准版 2
+− Oracle Database 19c 企业版、标准版 2
+− Oracle Database 12c 企业版 R1、R2 和标准版 2
+− Oracle Real Application Clusters One Node
+− Oracle 真正应用集群 (RAC)
+■ 支持：
+− Oracle 数据库选件
+− 适用于 Oracle 数据库企业版的 Oracle Enterprise Manager 管理包
+适用于 Oracle 数据库企业版的按需扩容软件许可
+■ 每台服务器启用 2、4、6、8、10、12、16、20、24、28 或 32 个处理器核心并具有相应数量的许可
+■ 注意：两台服务器必须启用相同数量的核心，但可以只为一台服务器购买软件许可，也可以为两台服务器购买软件许可，这取决于对高可用性的要求

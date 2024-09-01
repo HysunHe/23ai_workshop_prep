@@ -1,0 +1,7 @@
+问题： Oracle19c,融合数据库（Converged database）,Oracle 19c 对JSON支持吗？
+解答： Oracle数据库提供了对JSON的全面支持通过标准的DMLNoSQL APIs (Java, REST, C, Python, JavaScript, PL/SQL)分析 (点符号访问, 并行查询, QBE, 列访问)JSON数据指南，用于分析JSON集合的元数。
+Oracle Database 19c的改进包括：
+JSON Update操作
+对包含JSON_TABLE的查询的物化视图支持，使用JSON_EXISTS、JSON_VALUE的查询可以利用在包含JSON_TABLE函数的查询上创建的物化视图
+JSON函数简化
+JSON存储的数据类型有三种，VARCHAR2，CLOB，BLOBVARCHAR2性能最好，如果存储的数据较大，建议大家使用BLOB进行存储

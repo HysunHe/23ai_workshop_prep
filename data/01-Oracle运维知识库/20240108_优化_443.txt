@@ -1,0 +1,6 @@
+问题： Exadata,优化,什么是谓词过滤以及谓词过滤支持哪些条件运算符？
+解答： Exadata 存储服务器支持表扫描的谓词过滤。 Exadata 存储服务器只返回与过滤条件匹配的行，而不是返回所有行供数据库评估。
+此外，Exadata 存储服务器可以在谓词过滤期间评估许多常见的 SQL 函数。
+V$SQLFN_METADATA 中包含针对您的特定版本可卸载的函数列表。 
+SQL> select * from v$sqlfn_metadata where offloadable = 'YES';
+谓词过滤支持的条件运算符包括 =、!=、<、>、<=、>=、IS [NOT] NULL、LIKE、[NOT] BETWEEN、[NOT] IN、EXISTS、IS OF type、NOT、AND、OR。

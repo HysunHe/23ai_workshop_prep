@@ -1,0 +1,9 @@
+问题： Exadata,维护,Cell节点日志和Trace的位置在哪里？
+解答： Cell节点日志和Trace
+•	$ADR_BASE/diag/asm/cell/`hostname`/trace/alert.log
+•	$ADR_BASE/diag/asm/cell/`hostname`/trace/ms-odl.*
+•	$ADR_BASE/diag/asm/cell/`hostname`/trace/svtrc__0.trc -- ps -ef | grep“cellsrv 100”
+•	$ADR_BASE/diag/asm/cell/`hostname`/incident/*
+•	/var/log/messages*, dmesg
+•	/var/log/sa/*
+•	/var/log/cellos/*

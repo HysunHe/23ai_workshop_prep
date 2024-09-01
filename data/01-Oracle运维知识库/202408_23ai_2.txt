@@ -1,0 +1,23 @@
+问题： Oracle 23ai 有哪些新特性？
+解答： Oracle 23ai 发布了数百个新特性，尤其是在AI方面和提高开发人员生产力方面。以下列出一些重大的特性：
+- AI向量检索（向量数据库）
+- JSON二元性视图 (JSON Duality Views)
+- True Cache
+- 属性图（Property Graphs）
+- SQL 域（SQL Domains）
+- 注释（Annotations）
+- JSON Schema
+- 高可用性增强（High Availability）
+- 安全性增加（Security）
+- SQL 防火墙（SQL Firewall）
+- 模式级别权限（Schema Level Privileges）
+- 开发人员角色（Developer Role）
+- 性能和数据库生命周期管理（Performance & Database Lifecycle Management）
+- 缩小表空间（Shrink Tablespace）
+- 错误消息改进（Error Message Improvements）
+- SQL 分析报告（SQL Analysis Report）
+- SQL 增强功能（SQL Enhancements）
+- 布尔值（Boolean）
+- DDL 的 IF Exists (IF Exists for DDL)
+- 新表值子句（New Table Value Clause）
+- 更新和删除的直接连接（Direct Joins for Updates and Deletes）

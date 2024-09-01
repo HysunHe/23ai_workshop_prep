@@ -1,0 +1,3 @@
+问题： Oracle19c,性能（performance）,SQL监控 （SQL Monitor）怎么开启？
+
+解答： STATISTICS_LEVEL=TYPICAL（默认）或者ALL 时，SQL监控特性默认就已经开启。

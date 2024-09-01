@@ -1,0 +1,3 @@
+问题： Exadata,维护,我听说我应该关注电池的温度。我怎样才能做到这一点？
+解答： 可以使用以下命令确定所有cell的温度：
+•	dcli -g cell_group -l root "ipmitool sensor | grep 'Inlet Amb Temp'"

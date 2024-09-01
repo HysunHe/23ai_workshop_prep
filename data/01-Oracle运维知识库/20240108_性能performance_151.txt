@@ -1,0 +1,13 @@
+问题： Oracle19c,性能（performance）,触发SQL监控 （SQL Monitor）自动监控触发条件是什么？
+解答： 数据库会自动监控满足下面条件之一的SQL语句或者PL/SQL程序：
+✓	单次执行消耗大于等于5秒CPU/IO时间的SQL语句或者PL/SQL程序。
+✓	并行执行的SQL语句。
+✓	加/*+ MONITOR */ hint 的SQL语句。
+✓	用sql_monitor事件指定了SQL ID对应的SQL. 例如：ALTER SYSTEM SET EVENTS 'sql_monitor [sql: 5hc07qvt8v737|sql: 9ht3ba3arrzt3]  force=true’
+✓	利用存储过程DBMS_SQL_MONITOR.BEGIN_OPERATION  和  DBMS_SQL_MONITOR.END_OPERATION定义的会话里的所有SQL语句和PL/SQL程序。
+MONITOR hint强制让数据库监控该SQL. 例：
+SELECT /*+ MONITOR */ prod_id, AVG(amount_sold), AVG(quantity_sold) FROM
+sales GROUP BY prod_id ORDER BY prod_id;
+NO_MONITOR hint强制让数据库不要监控该SQL. 例：
+SELECT /*+ NO_MONITOR */ prod_id, AVG(amount_sold), AVG(quantity_sold) FROM
+sales GROUP BY prod_id ORDER BY prod_id;

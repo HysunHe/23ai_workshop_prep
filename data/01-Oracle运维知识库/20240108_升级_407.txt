@@ -1,0 +1,4 @@
+问题： Exadata,升级,如何知道当前单元软件版本以及要回滚到的可用版本？
+解答： 有用的命令
+•	imagehistory
+•	imageinfo

@@ -1,0 +1,2 @@
+问题： Oracle 审计仓库和数据库防火墙(AVDF),安全（ security),可以对非oracle数据库进行审计吗，比如MySQL，PG 等 
+解答： 支持的，目前AVDF支持Oracle Database，MySQL，PostgreSQL，Microsoft SQL Server，IBM Db2，SAP Sybase进行审计。 

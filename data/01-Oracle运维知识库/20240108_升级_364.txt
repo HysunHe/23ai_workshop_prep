@@ -1,0 +1,2 @@
+问题： Exadata,升级,Exadata image升级前precheck检查发现数据库版本不满足升级要求，请问该如何处理？
+解答： Exadata image升级对于集群和数据库版本有明确要求，必须满足最低版本要求后，才可以进行升级，对于版本要求详见官方文档：https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmso/new-features.html#GUID-45D4D12A-C249-46B3-B698-FE176601674B

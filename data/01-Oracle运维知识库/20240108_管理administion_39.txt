@@ -1,0 +1,2 @@
+问题： Oracle19c,管理 （administion),Real Optimizer统计信息仅在Exadata平台上可用吗
+解答： 是的

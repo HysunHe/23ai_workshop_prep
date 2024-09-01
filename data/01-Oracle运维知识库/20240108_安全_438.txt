@@ -1,0 +1,3 @@
+问题： Exadata,安全,Exadata 安全指南可以在线获取吗？
+解答： Exadata 研发提供了有关部署 Oracle Exadata 数据库服务器的最佳实践和建议的安全指南。
+https://docs.oracle.com/en/engineered-systems/exadata-database-machine/books.html

@@ -1,0 +1,14 @@
+问题： ODA,特性, Oracle 数据库机 X9-2-HA 的主要特性有哪些？
+解答： • 完全集成且完备的数据库和应用平台
+• Oracle 数据库企业版和标准版
+• Oracle Real Application Clusters 或 Oracle Real Application Clusters One Node
+• Oracle ASM 和 ACFS
+• Oracle Appliance Manager
+• 浏览器用户界面 (BUI)
+• 集成了备份和数据卫士 (DG)
+• 软件开发工具包 (SDK) 和 REST API
+• Oracle 云集成
+• Oracle Linux 和 Oracle Linux KVM
+• 混合列压缩的压缩率通常可达 10-15 倍
+• 附带至多两个存储盘柜的两台服务器
+• 支持固态盘 (SSD) 和硬盘 (HDD)

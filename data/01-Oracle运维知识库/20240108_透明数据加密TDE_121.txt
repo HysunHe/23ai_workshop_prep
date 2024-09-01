@@ -1,0 +1,9 @@
+问题： Oracle19c,透明数据加密 (TDE）,1.启用加密，应用这边需要做些什么调整吗
+2.加密的密钥怎么管理比较方便？
+解答： 1. 对应用端透明，无需任何调整，
+2. Oracle Key Vault可以集中密钥存储和集中密钥生命周期管理。
+优点有：
+管理密钥的生命周期，包括密钥的创建、轮换、停用和删除。
+防止由于密码遗忘或意外删除导致密钥和钱包的丢失。
+在组织内的授权端点之间安全地共享密钥。
+https://docs.oracle.com/en/database/oracle/key-vault/21.6/okvag/okv_intro.html#GUID-87BCC8D2-3BBF-4B4D-B6A1-96628F3C1CEE

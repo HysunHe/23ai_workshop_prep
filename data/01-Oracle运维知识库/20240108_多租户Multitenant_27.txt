@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),可刷新PDB的原理是什么呢？也是传输日志的方式吗？对源库的影响大吗？ 
+解答： 可刷新PDB的原理就是使用源库REDO来刷新，当可刷新PDB处于关闭状态进行手动刷新或自动刷新时，在alert日志中可以看到通过利用介质恢复来刷新：“Applying media recovery for pdb-4088 from SCN 9972173 to SCN 9976460…”,通过利用归档或REDO来进行数据库恢复，对源库的影响不大类似于ADG。

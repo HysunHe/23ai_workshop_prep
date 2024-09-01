@@ -1,0 +1,6 @@
+问题： Exadata,优化,我在执行计划中看到“storage”，但根据运行时和 IO 吞吐率判断，我的查询似乎并未进行卸载（offload），为什么？
+解答： 如果串行运行查询并且未执行direct path read，则可能会发生这种情况。
+•	卸载仅发生在direct path read（直接读取到 PGA）时
+•	PQ进程通常总是使用direct path read，因此会发生卸载
+•	串行运行的前台进程可以选择direct path read或通过buffer cache读取
+•	请注意，在某些情况下，从buffer cache读取实际上更好

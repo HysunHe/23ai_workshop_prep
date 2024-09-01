@@ -1,0 +1,7 @@
+问题： Oracle19c,补丁（Patch）,什么是零停机Oracle Grid Infrastructure补丁(ZDOGIP)？
+解答： 19.16 RU 中引入的新功能。源Grid Infrastructure (GI) 版本必须至少为19.16，并且在集群上运行的数据库应为19c。
+• ZDOGIP应用于GI Home，而不是RAC Oracle Home
+• 异地（out-of-place ）应用补丁
+• 应用GI补丁同时，所有节点上的RAC实例保持运行，提高数据库可用性
+• 零停机Oracle GI补丁(ZDOGIP)应用方式：OUI图形或静默方式
+• 注意：如果使用Grid Infrastructure OS 驱动程序（AFD、ACFS、ADVM），并且应用的补丁更新了GI OS驱动程序，则需要在服务器上停止并重新启动数据库实例。在这种情况下，必须依靠滚动补丁安装。

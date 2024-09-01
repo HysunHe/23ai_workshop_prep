@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),CDB和PDB是元数据和数据分离了么？
+解答： 针对元数据链接表来说，元数据定义在root中，而数据存放在pdb中。 

@@ -1,0 +1,7 @@
+问题： Oracle19c,补丁（Patch）,什么是RAC滚动方式应用补丁（RAC Rolling Patch ）
+解答： •滚动方式应用补丁适用于GI Home和RAC RDBMS Home
+• 滚动方式应用补丁步骤：1、集群节点1上的GI/RAC HOME 进程关闭，应用补丁，然后启动该节点进程。2、再对集群其他节点重复此过程，直到所有节点都应用补丁。
+• 滚动方式应用补丁期间业务不间断。
+• 滚动方式(Rolling patch)，最大的特点在于，允许RAC环境下，不同实例运行在不同的数据库版本上，当然这个不同，指的是打上rolling patch后造成的版本不一致
+• 滚动方式应用补丁的工具：1、opatchauto –自动方式，由root用户执行。2、 opatch –手动方式，由oracle用户执行
+• 并非所有补丁都可以滚动方式应用。查看补丁README

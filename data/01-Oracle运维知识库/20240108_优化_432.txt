@@ -1,0 +1,3 @@
+问题： Exadata,优化,在通过 ETL 将行添加到 EHCC 表的仓库中，是否可以将新行转换为 EHCC，或者定期重新压缩整个表？
+解答： 如果 ETL 使用Direct Path Load进行加载，则新行将采用 EHCC 压缩，否则将采用 OLTP 压缩。
+如果新行采用 OLTP 压缩，您将必须定期执行“alter table move”以将数据转换为 EHCC 压缩。

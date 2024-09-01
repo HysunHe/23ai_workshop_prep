@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),application container 和 sharding 有何异同？ 
+解答： application container主要用于存储一个或多个application后端的数据和元数，application container可以包括多个应用PDB，并使这些PDB能够共享元数据和数据，只能在应用安装、升级或打补丁中创建或更改这些应用公共数据，而sharding没有这些要求。

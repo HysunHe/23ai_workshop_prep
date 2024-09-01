@@ -1,0 +1,11 @@
+问题： Exadata,优化,EHCC 提供哪些压缩类型
+解答： EHCC 有以下类型： 
+
+1. 数据仓库级别压缩 
+适合数据仓库的压缩有两种子类型：
+a.	Query High
+b.	Query Low
+2. 归档压缩级别压缩 
+适合归档的压缩有两种子类型：
+a.	Archive High
+b.	Archive Low

@@ -1,0 +1,3 @@
+问题： Exadata,安全,Exadata 是否为寻求支付卡行业数据安全标准 (PCI DSS) 合规性的客户提供任何指导？
+解答： 外部审计公司准备了与 PCI DSS 相关的 Exadata 功能的技术简介：
+http://www.oracle.com/us/products/engineered-systems/exadata-pci-dss-compliance-wp-3157442.pdf

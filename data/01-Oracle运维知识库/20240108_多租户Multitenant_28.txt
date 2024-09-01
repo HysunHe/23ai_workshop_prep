@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),proxy pdb 通过服务方式连接，业务的操作响应时间是否会受proxy pdb 到源pdb之间的网络影响？ 
+解答： 会受到proxy pdb 与源pdb之间的网络影响，因此要确保它们之前的网络不能是瓶颈

@@ -1,0 +1,4 @@
+问题： 什么是Oracle 向量数据库（Oracle AI Vector Search）？
+解答： Oracle AI Vector Search 专为人工智能 (AI) 工作负载而设计，允许您基于语义而不是关键字查询数据。
+
+Oracle AI Vector Search 是一项新功能，允许用户根据数据的语义或含义搜索数据。该功能通过语义搜索增强了传统业务搜索，从而支持一类新应用。该功能允许您充分利用 SQL 的全部功能，生成、存储、索引和查询向量嵌入以及其他业务数据。

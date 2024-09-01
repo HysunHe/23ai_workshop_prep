@@ -1,0 +1,2 @@
+问题： Exadata,优化,如何禁用Smart Scan智能扫描？
+解答： cell_offload_processing=false (默认 true)

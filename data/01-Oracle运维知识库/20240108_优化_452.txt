@@ -1,0 +1,6 @@
+问题： Exadata,优化,如何判断是否启用了回写闪存缓存？
+解答： 执行：
+#dcli -g ~/cell_group -l root cellcli -e "list cell attributes flashcachemode"
+结果：
+flashCacheMode: WriteBack -> 回写闪存缓存已启用
+flashCacheMode: WriteThrough -> 回写闪存缓存未启用

@@ -1,0 +1,2 @@
+问题： ZDLRA,MAA,ZDLRA有什么健康检查工具吗？
+解答： ZDLRA底层与Exadata一样，有exachk健康检查工具，建议始终下载最新版本exachk来运行。

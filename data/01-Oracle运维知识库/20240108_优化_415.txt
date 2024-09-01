@@ -1,0 +1,7 @@
+问题： Exadata,优化,Exadata Cell 节点的独特功能是什么？
+解答： Cell节点独特之处：
+•	Smart Scan智能扫描
+•	HCC混合列压缩
+•	存储索引
+•	闪存
+•	多数据库环境中的 Exadata I/O 资源管理

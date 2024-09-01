@@ -1,0 +1,79 @@
+问题： Oracle 任意版本,性能（performance）,自动SQL调整集是 Automatic SQL Tuning Sets (ASTS 是什么？怎么启用和关闭？
+解答： ASTS 使用自动后台任务进行维护，该任务在 Oracle Database 19c RU 19.7 中默认启用。 虽然 ASTS 是常见的基础设施功能，不会对数据库的运行时行为产生任何影响（除了占用 SYSAUX 中的有限空间），但一些客户表示应该在 RU 中默认不启用此功能。 因此，Oracle 决定在此数据库版本的未来 RU 中默认禁用 ASTS，让客户自行明确启用 ASTS。 在 19c RU 19.8 中默认禁用。
+ASTS 是 SQL 执行计划和 SQL 语句性能指标的历史记录。 它与自动工作负载存储库 (AWR) 不同，因为它不限于消耗大量系统资源的语句。 随着时间的推移，ASTS 将包括系统上看到的所有查询的示例，但它确实对不可重用语句的集合施加了限制，例如临时查询或使用文字而不是绑定变量的语句。
+ASTS 是 AWR 的补充，被视为 Oracle 数据库的类似核心可管理性基础架构。
+ASTS 对于诊断和潜在地纠正 SQL 性能回归（在回归是由计划更改引起的情况下）特别有用。 在这种情况下，AWR 中不太可能提供更好的计划，但 ASTS 中可以提供。 这很重要，因为 SQL 计划管理可用于定位、测试和实施 ASTS 中包含的更好的 SQL 执行计划。 这使得 SQL 性能回归可以快速且轻松地得到纠正。 此外，自动 SQL 计划管理无需人工干预即可实现整个工作流程（有关可用性详细信息，请参阅数据库许可信息用户手册）。
+总之，ASTS 是一个旨在快速轻松地解决 SQL 语句性能回归问题的组件。 它减轻了与数据库更改、系统配置更改和升级相关的风险。
+ASTS 是自我维护的，无需进行配置。 Oracle 建议启用它，但如果愿意也可以禁用它。
+自动索引依赖于 ASTS，因此如果您使用此功能，则不得禁用 ASTS 任务。 自动 SQL 计划管理使用 ASTS 作为替代 SQL 执行计划的来源，因此如果您使用此功能，则不应禁用 ASTS。
+
+任务性能和空间利用率
+正常系统的资源利用率可以忽略不计，大多数情况下可以忽略； 对于空间和 CPU 消耗来说都是如此。 以下 SQL 语句提供了对所使用资源的深入了解。
+
+您可以获取 ASTS 任务的运行时性能摘要，如下所示：
+With dur As
+(
+Select (To_Date('1','J')+Run_Duration-to_Date('1','J'))* 86400 Duration_Sec,
+       (To_Date('1','J')+CPU_Used-to_Date('1','J'))* 86400 CPU_Used_Sec
+From DBA_Scheduler_Job_Run_Details
+Where job_name = 'ORA$_ATSK_AUTOSTS'
+)
+Select Min(Duration_Sec) ASTS_Min_Time_Sec,
+       Max(Duration_Sec) ASTS_Max_Time_Sec,
+       Avg(Duration_Sec) ASTS_Average_Time_Sec,
+       Avg(CPU_Used_Sec) ASTS_Average_CPU_Sec
+From dur; 
+
+ASTS 任务定期执行。 每次执行之间的间隔可以检查如下：
+Select Task_Name,
+       Interval Task_Interval_in_Seconds
+From DBA_AutoTask_Schedule_Control
+Where Task_Name = 'Auto STS Capture Task';
+空间消耗：
+Select Table_Name,
+Round(Sum(size_b)/1024/1024, 3) Table_Size_MB,
+Round(Max(Total_Size_B)/1024/1024, 3) Total_Size_MB
+From (Select Table_Name, Size_B, Sum(Size_B) Over() Total_Size_B
+From
+(Select Segment_Name as table_Name, Bytes Size_B
+From DBA_Segments
+Where Segment_Name Not Like '%WORKSPA%'
+And Owner = 'SYS'
+And (segment_Name Like 'WRI%SQLSET%'
+Or Segment_Name Like 'WRH$_SQLTEXT')
+Union All
+Select t.Table_Name, Bytes Size_B
+From DBA_Segments s,
+(Select Table_Name, Segment_Name
+From DBA_Lobs
+Where Table_Name In ('WRI$_SQLSET_PLAN_LINES','WRH$_SQLTEXT')
+And Owner = 'SYS') t
+Where s.Segment_Name = t.Segment_Name))
+Group By Table_Name
+Order By Table_Size_MB Desc;
+任务状态：
+Select Task_Name,
+       Enabled
+From DBA_AutoTask_Schedule_Control
+Where Task_Name = 'Auto STS Capture Task';
+TASK_NAME ENABLED
+------------------------------ -------
+Auto STS Capture Task FALSE
+
+启用任务
+Begin
+DBMS_Auto_Task_Admin.Enable(
+Client_Name => 'Auto STS Capture Task',
+Operation => NULL,
+Window_name => NULL);
+End;
+/
+禁止任务
+Begin
+DBMS_Auto_Task_Admin.Disable(
+Client_Name => 'Auto STS Capture Task',
+Operation => NULL,
+Window_name => NULL);
+End;
+/
+注意：在 19.7 中，应在所有容器中禁用 autotask。

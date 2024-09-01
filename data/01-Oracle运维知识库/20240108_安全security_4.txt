@@ -1,0 +1,4 @@
+问题： Oracle 审计仓库和数据库防火墙(AVDF),安全（ security),一个update语句更新了很多记录，也都会在这里显示吗？ 
+解答： 在Logging Level可以根据你选择的策略来记录，如果想要都显示的话，选择Always .在Logging Level
+Don’t Log：不记录 Sample:采样记录 One-Per-Session：同一个会话只记录一次
+One-Accoss-Sessions: 多个会话只记录一次 Always:总是记录

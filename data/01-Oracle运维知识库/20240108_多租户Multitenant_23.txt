@@ -1,0 +1,3 @@
+问题： Oracle19c,多租户（Multitenant),drop pluggable database默认会保留数据文件，这样设计的目的是什么？如果我们想用这些数据文件再恢复删除的PDB应该如何操作？
+解答： 当drop命令一个pdb时，可以采用keep datafiles或including datafile，如果pdb没有使用unplugged则只能使用drop …including datafile命令，如果要指定keep datafiles则pdb必须是unplugged，所以keep datafiles只是针对unplugged的pdb。
+对一个unplugged pdb进行drop时默认使用keep datafiles来保留数据文件，这样做的意义就是你可以使用拨出时生成的.xml元数据文件再加上保留的数据文件来插入此数据库，进而恢复此数据库。

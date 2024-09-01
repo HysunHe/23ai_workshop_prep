@@ -1,0 +1,10 @@
+问题： Oracle19c,透明数据加密 (TDE）,调整TDE性能有什么建议？
+解答： 关于列加密：
+1.	加密一小部分列
+2.	可以选择关闭完整性检查
+3.	在完成加列密后，重建列索引
+关于表空间加密：
+1.	适当地设置SGA大小
+2.	使用Advanced Compression 或 Columnar Compression来压缩数据
+3.	使用提供CPU加密加速的硬件和软件
+4.	如果在Exadata上运行，确保开启smart scan

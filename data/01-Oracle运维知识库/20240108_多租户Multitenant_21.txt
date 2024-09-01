@@ -1,0 +1,3 @@
+问题： Oracle19c,多租户（Multitenant),创建快照轮播，创建了以后，相应的快照会存在哪里？比如存在哪个目录下面？
+解答： 通过DBA_PDB_SNAPSHOTS视图可以查看快照信息：如快照名称、快照SCN、快照完整路径等，参考如下：
+SELECT CON_ID,CON_NAME,SNAPSHOT_NAME,SNAPSHOT_SCN,FULL_SNAPSHOT_PATH FROM DBA_PDB_SNAPSHOTS ORDER BY SNAPSHOT_SCN;

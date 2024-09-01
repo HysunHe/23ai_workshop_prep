@@ -1,0 +1,6 @@
+问题： Oracle19c,透明数据加密 (TDE）,对于列加密，什么情况会导致索引不可使用？
+解答： 1. 确保在要创建索引的加密列上使用 "NO SALT" 选项 - 不允许在使用了（SALT）的列上创建索引。
+2.加密列上不支持位图索引。
+3.外键不支持透明数据加密
+4. 只支持对 TDE 列进行相等查找的索引扫描。范围扫描（BETWEEN、LIKE）不支持，因为索引中的数据是加密的，所以按照加密值进行排序，而不是按照未加密值进行排序。除了相等查找之外的任何操作都将使用全表扫描。
+可参考 Best Practices For Having Indexes On Encrypted Columns Using TDE Column encryption. (Doc ID 454980.1)

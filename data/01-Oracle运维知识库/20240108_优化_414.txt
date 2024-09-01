@@ -1,0 +1,2 @@
+问题： Exadata,优化,如何在智能缓存中缓存对象？
+解答： DBA 可以通过将 CELL_FLASH_CACHE 设置为 KEEP 来缓存对象。此设置的默认值为 DEFAULT。

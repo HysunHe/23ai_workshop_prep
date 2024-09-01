@@ -1,0 +1,2 @@
+问题： ZDLRA,MAA,ZDLRA catalog数据需要备份吗？
+解答： 会自动备份到/raacfs/raadmin/ra_export目录下，建议及时的进行异地备份。

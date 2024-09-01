@@ -1,0 +1,2 @@
+问题： Oracle19c,管理 （administion),自动索引是Oracle DB EE许可证的一部分，还是需要其他许可证？
+解答： 该功能与Exadata（本地）和自治数据库一起提供。

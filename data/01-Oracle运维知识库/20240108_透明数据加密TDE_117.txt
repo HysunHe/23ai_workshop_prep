@@ -1,0 +1,3 @@
+问题： Oracle19c,透明数据加密 (TDE）,列加密会导致索引不可用？
+解答： 在某些情况下，索引可能无法使用，导致查询退回到全表扫描
+可参考 Best Practices For Having Indexes On Encrypted Columns Using TDE Column encryption. (Doc ID 454980.1)

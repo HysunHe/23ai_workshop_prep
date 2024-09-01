@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),应用连接proxy pdb的话， 应用是仅与proxy pdb 建立连接吗，不用跟实际的pdb建立连接是吗？
+解答： 是的，不需要与引用pdb建立连接，应用连接proxy pdb之后，在proxy pdb中发出的SQL语句会在引用 PDB中被执行，远程执行的结果被返回给Proxy PDB。

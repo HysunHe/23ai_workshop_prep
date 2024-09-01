@@ -1,0 +1,2 @@
+问题： Exadata,DBO,ExaCC 包含或可用哪些数据库选项？
+解答： 客户的 Exadata Cloud 配备了 Oracle 数据库企业版 - 极致性能。它提供了 Oracle 数据库企业版的所有功能，以及所有数据库企业管理包和所有企业版选项，例如 Oracle Database In-Memory 和 Oracle Real Application Clusters (RAC)。

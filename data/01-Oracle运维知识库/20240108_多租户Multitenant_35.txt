@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),Oracle 免费的PDB可以有多少个
+解答： 一个CDD里3个，超过三个需要购买许可证

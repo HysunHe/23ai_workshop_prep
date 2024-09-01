@@ -1,0 +1,5 @@
+问题： Exadata,升级,Exadata image升级需要都包含哪些工作内容？
+解答：  Exadata image升级主要包括三个组件
+（1）Exadata存储服务器升级
+（2）Exadata数据库服务器升级
+（3）Exadata RDMA网络结构交换机升级

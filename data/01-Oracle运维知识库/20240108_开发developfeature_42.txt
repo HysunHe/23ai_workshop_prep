@@ -1,0 +1,5 @@
+问题： Oracle12c-21C ,开发 （develop feature),请问在私有临时表上，做DML 时，会产生redo 和undo 吗？
+解答： 之前版本的 Oracle 全局 临时 表 DML操作 会 产 生 undo和少量 redo 因 为 所有 undo都受到 redo的保 护 临时
+表 产 生了 und也 产 生了 redo。 临时 表 产 生的 redo的大小却比普通表 DML操作的小，是因 为临时 表中只 记录 了
+UNDO数据 变 化所 产 生的 redo, 不 记录 表中数据 变 化所 产 生的 redo。 12c 之后 有个新特性 Temporary Undo Segments 将全局 临时 表 产 生的 undo挪到了 临时 表空 间 减少 undo表空 间 的使用率及减少 redo和 归 档日志的 产 生
+量 这 个特性 通 过 temp_undo_enabled参数控制 。私有临时 表 日志 产 生 也是类似的 ，它的特殊之 处 在于它是 a memory-based temporary table 其表定 义 和数据都是 临时的，并在事 务 或会 话结 束 时删 除 。

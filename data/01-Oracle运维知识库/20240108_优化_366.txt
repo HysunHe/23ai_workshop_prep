@@ -1,0 +1,3 @@
+问题： Exadata,优化,什么是Exadata RDMA 内存？
+解答： Oracle Exadata 系统软件版本 23.1.0 引入了 Exadata RDMA 内存 (XRMEM)。 XRMEM 整合了所有 Exadata 功能，可使用远程直接内存访问 (RDMA) 直接访问存储服务器内存，从而实现更快的响应时间和更低的读取延迟。
+XRMEM 包含之前基于持久内存 (PMEM) 的 Exadata 数据和提交加速器，该加速器仅在 Exadata X8M 和 X9M 存储服务器型号中可用。

@@ -1,0 +1,9 @@
+问题： Exadata,优化,如何检查特定行的压缩格式？
+解答： 使用 dbms_compression.get_compression_type() 获取行级别的压缩类型。
+返回值为输入 rowid 的压缩类型：
+COMP_NOCOMPRESS = 1
+COMP_FOR_OLTP = 2
+COMP_FOR_QUERY_HIGH = 4
+COMP_FOR_QUERY_LOW = 8 
+COMP_FOR_ARCHIVE_HIGH = 16 
+COMP_FOR_ARCHIVE_LOW = 32

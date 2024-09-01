@@ -1,0 +1,2 @@
+问题： Oracle19c,版本 （Version）,是否会有可使用CDB/3xPDB免费选项的19c“SE2”版本？
+解答： 是的，SE2 Oracle Database 19c也有3个 PDB。现已可用。

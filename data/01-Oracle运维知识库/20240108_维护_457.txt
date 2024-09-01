@@ -1,0 +1,12 @@
+问题： Exadata,维护,我计划对ExaCC进行定制化，有什么需要关注的？
+解答： 自定义 ExaCC 环境或配置可能会导致修补失败。保持尽可能低的定制化程度。
+不该做的事
+•	不要更改 /etc/oratab 文件
+•	不更新中央清单 XML 文件
+•	不要占用 /u02 中的所有空间
+•	不要使用预配置的 ACFS 文件系统：
+o	/var/opt/oracle/dbaas_acfs
+o	/u02/app_acfs
+o	/acfs01
+它们用于暂存补丁和进行备份。
+•	不要修改 opc、oracle 和 grid OS 用户的配置

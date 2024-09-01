@@ -1,0 +1,2 @@
+问题： Oracle19c,内存数据库（ In-Memory DB),Oracle Database In-Memory 是免费的吗？
+解答： Database In-Memory Base Level 是免费的，如何启用 Base Level Feature：  - INMEMORY_FORCE 参数设置为BASE_LEVEL，INMEMORY_SIZE 最多可以使用 16GB

@@ -1,0 +1,4 @@
+问题： Exadata,优化,如何禁用表上的 EHCC 压缩？
+解答： 要禁用或解压缩 EHCC 表，请使用 alter table 命令，如下所示：
+SQL> alter table example  nocompress; 
+SQL> alter table example  move nocompress;

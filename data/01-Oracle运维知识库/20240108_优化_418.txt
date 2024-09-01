@@ -1,0 +1,7 @@
+问题： Exadata,优化,Cell 相关的数据库视图通常有哪些？
+解答： Cell相关的数据库视图：
+•	sql> select * from sys.GV_$CELL_STATE;
+•	sql> select * from sys.GV_$CELL;
+•	sql> select * from sys.GV_$CELL_THREAD_HISTORY;
+•	sql> select * from sys.GV_$CELL_REQUEST_TOTALS;
+•	sql> select * from sys.GV_$CELL_CONFIG;

@@ -1,0 +1,19 @@
+问题：Oracle Database 19c的升级和迁移方法包括哪些？
+解答：
+Parallel Upgrade Utility：通过命令行运行catctl.pl或dbupgrade，手动完成Oracle数据库的升级。
+
+DBUA (Database Upgrade Assistant)：通过DBUA图形化界面，依据引导流程完成Oracle数据库的升级。
+
+AutoUpgrade：Oracle数据库自动升级工具，可以自动执行升级前准备、升级和升级后检查过程。支持目标版本为12.2及以上、18.5及以上、19.3及以上的升级。
+
+Data Pump：适用所有版本和平台，要使用Data Pump需要10.1.0.2或更高版本，停机时间长
+TTS (Transportable Tablespaces  Sets)XTTS (Cross-Platform Transportable Tablespace Sets)：
+8i及以后：TTS（从8i开始），XTTS(从10g开始，支持跨平台）相同的字符集和国家字符集，如果跨字节序（10g+)，需要配合RMAN's convert
+
+GoldenGate：适用于要求接近零停机时间的升级场景
+Data Guard：适用于要求接近零停机时间的升级场景
+
+使用拔出/插入PDB，克隆远程PDB/克隆非CDB，重定位PDB的方式：源平台和目标平台的字节序相同。源平台安装的数据库选件与目标平台安装的数据库选项相同，或者是目标平台安装的数据库选项的子集。
+拔出/插入PDB：非CDB必须运行12.1.0.1或更高版本
+克隆非CDB：CDB和非CDB必须运行12.1.0.2或更高版本，CDB和非CDB必须运行相同的Oracle数据库版本
+重定位PDB：源平台和目标平台必须运行12.2.0.1或更高版本

@@ -1,0 +1,3 @@
+问题： Exadata,优化,Exadata上USE_LARGE_PAGES默认值是AUTO_ONLY?
+解答： 在 Oracle Exadata 上，从 Oracle Database 19c 开始，USE_LARGE_PAGES 数据库初始化参数的默认值为 AUTO_ONLY。 此设置提供了一种简单的机制，允许数据库自动使用大内存页（也称为大页）来存放 Oracle 数据库系统全局区域 (SGA)，而无需任何系统管理工作。
+在启动过程中，当USE_LARGE_PAGES=AUTO_ONLY时，数据库会计算SGA所需的大页数量，并向操作系统动态请求它们。 如果请求成功，数据库将使用大页中的 SGA 启动。 如果操作系统不能满足要求，则数据库无法启动。

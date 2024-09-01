@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),Oracle 支持一直到19c non-CDB为止？
+解答： Oracle Database 19c以及更低版本支持Non-CDB，但从Oracle Database 21c及更高版本开始则不再支持。

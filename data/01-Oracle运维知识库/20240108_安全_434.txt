@@ -1,0 +1,3 @@
+问题： Exadata,安全,可以在不关闭数据库的情况下通过 ksplice 更新内核吗？
+解答： Exadata 为数据库节点提供 ksplice uptrack 更新。
+方法：Install ksplice kernel updates for Exadata Database Nodes (Doc ID 2207063.1)

@@ -1,0 +1,2 @@
+问题： Exadata,升级,Exadata image升级是否需要停机窗口
+解答： Exadata的数据库服务器、存储服务器、RDMA网络结构交换机的升级可以选择停机方式升级和在线rolling滚动方式升级。

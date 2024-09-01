@@ -1,0 +1,2 @@
+问题： Oracle 审计仓库和数据库防火墙(AVDF),安全（ security),avdf 12可以支持hostmonitor吗？我测试过，11G用avdf 12 在关联防火墙的时候会要求选网桥或代理，不像avdf 20可以选择单个网卡？ 
+解答： 建议直接使用或升级到AVDF 20，AVDF 12某一些功能限制，加上AVDF 12即将过期不再support； 

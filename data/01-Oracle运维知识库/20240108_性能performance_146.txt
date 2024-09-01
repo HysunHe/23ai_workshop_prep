@@ -1,0 +1,39 @@
+问题： Oracle19c,性能（performance）,怎么实现SQL隔离？
+解答： 手动隔离- 为SQL语句的执行计划创建隔离配置。使用以下任一包函数为SQL语句的执行计划创建隔离配置：
+DBMS_SQLQ.CREATE_QUARANTINE_BY_SQL_ID
+DBMS_SQLQ .CREATE_QUARANTINE_BY_SQL_TEXT
+例子：
+DECLARE
+quarantine_config VARCHAR2(30);
+BEGIN
+quarantine_config := DBMS_SQLQ.CREATE_QUARANTINE_BY_SQL_ID( SQL_ID => ’8vu7s907prbgr’, PLAN_HASH_VALUE => '3488063716');
+END;
+/
+DECLARE
+quarantine_config VARCHAR2(30);
+BEGIN
+quarantine_config := DBMS_SQLQ.CREATE_QUARANTINE_BY_SQL_ID( SQL_ID => '152sukb473gsk');
+END;
+/
+DECLARE
+quarantine_config VARCHAR2(30);
+BEGIN
+quarantine_config := DBMS_SQLQ.CREATE_QUARANTINE_BY_SQL_TEXT( SQL_TEXT => to_clob('select count(*) from emp'));
+END;
+/
+
+可指定如下隔离阈值：
+- CPU time
+- Elapsed time
+- I/O in megabytes
+- Number of physical I/O requests
+- Number of logical I/O requests
+例子：
+BEGIN
+DBMS_SQLQ.ALTER_QUARANTINE( QUARANTINE_NAME => 'SQL_QUARANTINE_3z0mwuq3aqsm8cfe7a0e4', PARAMETER_NAME => 'CPU_TIME',
+PARAMETER_VALUE => '5');
+DBMS_SQLQ.ALTER_QUARANTINE( QUARANTINE_NAME => 'SQL_QUARANTINE_3z0mwuq3aqsm8cfe7a0e4', PARAMETER_NAME => 'ELAPSED_TIME',
+PARAMETER_VALUE => '10');
+END;
+/
+如果任何Resource Manager阈值等于或小于SQL语句的隔离配置中指定的隔离阈值，则该SQL语句（如果使用其隔离配置中指定的执行计划）则不允许运行

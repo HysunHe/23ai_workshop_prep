@@ -1,0 +1,8 @@
+问题： Oracle 审计仓库和数据库防火墙(AVDF),安全（ security),审计策略需要自定义吗，还是有默认的审计策略可以直接使用？
+解答： 你可以根据需要来启动19c里面默认的审计策略，如果默认的审计不满足你的要求再进行自定义审计策略.比如：ORA_LOGON_FAILURES：审计失败的登录
+ORA_SECURECONFIG：统一审计策略提供所有安全配置审计选项
+ORA_DATABASE_PARAMETER：策略审计Oracle数据库参数设置。
+ORA_ACCOUNT_MGMT：策略审计的用户帐户和权限设置。
+ORA_LOGON_LOGOFF：策略审计登录和注销操作。
+其他默认的审计策略说明请查看以下的
+https://docs.oracle.com/en/database/oracle/oracle-database/23/dbseg/configuring-audit-policies.html#GUID-C43651C6-A35C-4EEF-BEA7-EADA408BFF67

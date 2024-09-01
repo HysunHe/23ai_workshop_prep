@@ -1,0 +1,3 @@
+问题： Exadata,安全,在哪里可以找到有关扫描工具识别的特定漏洞的更多信息？
+解答： 常见漏洞和暴露 (CVE) 在 Exadata 研发发布的每月版本中更新。必须及时更新 Exadata 环境的补丁。
+参考文档：How to research Common Vulnerabilities and Exposures (CVE) for Exadata packages (Doc ID 2256887.1)

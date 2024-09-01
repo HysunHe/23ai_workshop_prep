@@ -1,0 +1,2 @@
+问题： Exadata,General,Exadata发展到第几代了？
+解答： Oracle Exadata已经发展到12代了，最新的为Exadata x10m，是2023年推出的新产品。Oracle根据硬件发展，每隔1到2年会推出新一代的exadata产品,均会使用最新和最先进的硬件产品。

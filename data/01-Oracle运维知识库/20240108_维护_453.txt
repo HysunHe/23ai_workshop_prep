@@ -1,0 +1,4 @@
+问题： Exadata,维护,如何验证 Exadata 上启用的硬盘清理活动？
+解答： 使用命令：
+cellcli –e list cell attributes name,hardDiskScrubInterval
+输出示例：exatestcel12 biweekly                       !! 每两周启用一次

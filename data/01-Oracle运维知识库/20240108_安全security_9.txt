@@ -1,0 +1,2 @@
+问题： Oracle 审计仓库和数据库防火墙(AVDF),安全（ security),在数据库主机上的EXP,EXPDP操作能审计吗？ 
+解答： 可以，参数文档Doc ID 2610639.1 

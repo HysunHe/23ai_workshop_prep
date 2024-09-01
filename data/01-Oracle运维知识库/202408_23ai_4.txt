@@ -1,0 +1,6 @@
+问题： 什么是JSON二元性视图 (JSON Duality Views)？
+解答： JSON 关系二元视图将我们的关系数据显示为 JSON 文档，允许使用传统 SQL 或直接使用 JSON 执行查询和 DML 操作。
+
+Oracle Database 23ai JSON Relational Duality 通过在单个数据库中统一关系和文档数据模型的优势，彻底改变了 AppDev。
+
+实例参考：https://oracle-base.com/articles/23/json-relational-duality-views-23

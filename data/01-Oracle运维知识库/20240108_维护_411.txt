@@ -1,0 +1,8 @@
+问题： Exadata,维护,我的一个cell重新启动了。我应该怎么办？
+解答： 在asm中确认cell是否重启成功以及griddisk是否在线。检查并确保每个griddisk都在线：
+SQL> select failuregroup, mode_status, count(*) from v$asm_disk group by failuregroup, mode_status;
+另请考虑以下信息来源：
+•	ASMCMD> lsdg（请参阅输出中的offline_disks 列）
+•	ASM实例警报日志
+•	v$asm_disk.repair_timer（删除前剩余秒数）
+•	v$asm_disk.mode_status

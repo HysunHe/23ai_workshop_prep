@@ -1,0 +1,2 @@
+问题： Exadata,优化,我们可以对EHCC表使用DBMS_REDEFINITION在线重定义包吗？
+解答： 是的。 DBMS_REDEFINITION确实支持EHCC表，并且可用于以在线模式移动数据。

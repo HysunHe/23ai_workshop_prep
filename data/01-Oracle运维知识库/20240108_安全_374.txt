@@ -1,0 +1,4 @@
+问题： Exadata,安全,什么是安全擦除器？
+解答： Oracle Exadata 系统软件软件版本 12.2.1.1.0 或更高版本为 Oracle Exadata 数据库云服务器中的每个组件提供了一个安全擦除解决方案，称为 Secure Eraser。 这是一个全面的解决方案，涵盖所有 Exadata 数据库云服务器 V2 及更高版本，包括 2 插槽和 8 插槽服务器。
+在早期版本的 Oracle Exadata 数据库云服务器中，您可以通过 DROP CELL ERASE、DROP CELLDISK ERASE 或 DROP GRIDDISK ERASE 等 CellCLI 命令安全地擦除用户数据。 但是，这些 DROP 命令仅涵盖硬盘驱动器和闪存设备上的用户数据。 Secure Eraser 可清理所有内容，不仅包括用户数据，还包括操作系统、Oracle Exadata 系统软件和用户配置。 此外，Secure Eraser 涵盖更广泛的硬件组件，包括硬盘驱动器、闪存设备、内部 USB 和 ILOM。
+安全擦除器可以安全地擦除数据库服务器和存储服务器上的所有数据，并将 InfiniBand 交换机、以太网交换机和配电装置重置为出厂默认设置。 您可以使用此功能来停用 Oracle Exadata 或重新调整其用途。 安全擦除器可以完全擦除机器每个组件上的所有数据和元数据痕迹。

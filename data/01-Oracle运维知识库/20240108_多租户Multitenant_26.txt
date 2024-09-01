@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),snap pdb是可以读写的吗
+解答： 使用“CREATE PLUGGABLE DATABASE pdb1_snap_copy FROM PDB1 SNAPSHOT COPY;”命令创建的snapshot copy pdb是可以读写的。 

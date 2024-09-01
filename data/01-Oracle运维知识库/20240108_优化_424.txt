@@ -1,0 +1,9 @@
+问题： Exadata,优化,如何转换现有非 EHCC 表以使用 EHCC ？
+解答： 可以使用下面的 alter table 命令将现有非 EHCC 表转换为 EHCC。
+例子：
+SQL > alter table example move compress for query high; 
+SQL > alter table example compress for query high；
+在第一种情况下，指定移动时，现有数据将被移动到新的压缩格式。
+在第二种情况下，插入到表中的新数据将使用 EHCC 压缩，现有数据保持不变。
+您还可以为现有表中的每个分区指定不同的压缩类型。例如： 
+ALTER TABLE <TABLENAME> MODIFY PARTITION <PARTITION NAME> compress for query high；

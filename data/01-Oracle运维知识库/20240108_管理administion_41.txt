@@ -1,0 +1,61 @@
+问题： Oracle19c,管理 （administion),DB 19c中Data Pump有哪些最佳实践？
+解答： 
+1、始终使用par 参数文件，听起来奇怪，但是许多问题都是因为人们在命令行输入很长的Data Pump命令出错。
+例:
+DIRECTORY=my_data_pump_dir
+DUMPFILE=dumpfile.dmp
+LOGFILE=logfile.log
+SCHEMAS=HR
+EXCLUDE=STATISTICS
+LOGTIME=ALL
+METRIC=YES
+FLASHBACK_TIME=SYSTIMESTAMP
+expdp parfile=my_data_pump_parfile.par
+
+2、一致的数据泵导出（数据一致性）:
+Ø	FLASHBACK_SCN=<scn>
+Ø	FLASHBACK_TIME=SYSTIMESTAMP
+这两个参数不能同时使用；
+如果使用了Network_link,SCN参数值为源库的对应SCN值；
+Flashback_scn仅适用于数据库的闪回查询，不适用于闪回数据库，闪回Drop以及闪回数据归档功能；
+对于不支持大SCN的版本，不能为网络导出或网络导入指定大SCN。
+或者:
+Ø	CONSISTENT=Y  [since Oracle 11.2 – Legacy Interface]
+     实际导出时取决于当前时间并使用FLASHBACK_TIME；这会增加导出数据期间的UNDO量；
+ 
+3、
+在导出过程中始终使用:
+EXCLUDE=STATISTICS
+重新创建新的统计信息或使用DBMS_STATS staging table进行统计信息迁移
+LOGTIME=ALL
+从 Oracle Database 12.1开始
+METRICS=YES
+对象数和时间记录在数据泵日志文件中
+
+在导入过程中始终使用:
+LOGTIME=ALL
+从 Oracle Database 12.1开始
+METRICS=YES
+
+4、	使用并行，使用PARALLEL=n
+ 11g之后的企业版export/import均可设置并行；通常，将并行度设置为CPU数量的2倍，但可能需要调整。注意在RAC环境使用并行时，Directory需要指向所有实例都能访问的共享存储。Trigger/View/Sequence/Constraint/Object_grant/REF_constraint导出时不能并行。从12.2版本开始，在expdp和impdp元数据可以并行
+
+5、将STREAMS_POOL_SIZE设置为合理的值(64MB ⇠ ⇢ 256MB)
+当服务器位于不同的操作系统和存储/ SAN上时，请使用NETWORK_LINK
+在目标数据库上通过database link启动impdp，可以不生成dump file。
+从Oracle 12.2开始: 支持通过dblink进行直接路径加载 (包括 LONG 数据)
+使用：ACCESS_METHOD=DIRECT_PATH
+限制:
+不支持并行导元数据
+在Oracle 12.2之前不支持LONG和LAW格式
+数据并行性仅限于多个分区或表；在一个大的非分区表上没有PQ 并行
+
+6、	BasicFile (old) LOBs 总是很慢，SecureFile LOBs 快一些
+a)	特别是与分区结合使用
+b)	使用DBMS_REDEFINITION或ONLINE TABLE MOVE（18c）将Basic转换为SecureFile LOB
+c)	在导入操作时，使用DBMS_DATAPUMP或者DBMS_METADATA的LOB_STORAGE参数，强制将旧的LOB转换为SecureFiles
+
+7、关于数据库字符集
+     建议源库和目标库字符集一致，隐式字符集转换以目标库字符集为准，可能会导致报错
+
+8、关于Version，尤其是在数据库升级降级时，注意参考数据库的Compatible参数设置，设置version参数时要慎重。

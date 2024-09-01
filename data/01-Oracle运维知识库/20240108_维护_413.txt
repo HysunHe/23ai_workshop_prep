@@ -1,0 +1,9 @@
+问题： Exadata,维护,我怀疑网络有问题。我怎么知道我的 InfiniBand 结构没问题？
+解答： 请参阅 MOS 说明： 1053498.1并尝试以下工具：
+•	这些返回整个集群的信息，因此从一个节点运行，而不是所有节点
+•	/usr/bin/ibdiagnet –c 1000
+•	检查输出信息末尾的错误和警告摘要
+•	在日志文件 (/tmp/ibdiagnet*) 中搜索详细信息
+•	/opt/oracle.cellos/SupportTools/ibdiagtools/infinicheck
+•	该脚本会生成大量 IB 流量来测量吞吐量，因此在运行时会影响性能
+•	/usr/sbin/iblinkinfo.pl 显示所有端口上的链接状态

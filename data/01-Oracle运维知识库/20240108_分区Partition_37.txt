@@ -1,0 +1,6 @@
+问题： Oracle19c,分区（Partition),Oracle 混合分区表有什么特点？
+解答： 1、扩展Oracle分区，允许分区存储在Oracle数据库段和外部文件中
+2、外部分区可以存储在标准文件系统、HDFS或对象存储上。将Hive & HDFS 分区表映射到Oracle生态系统中，展示了Oracle分区对于基于外部HDFS数据存储的强大功能(分区修剪和维护/大数据感知优化)
+3、混合分区带来的收益。该模式支持在低成本存储上对数据进行长期归档，同时允许对其继续在线访问，支持长期访问不经常访问的数据，以满足行业法规需求
+4、表级别的外部参数应用于混合分区表的所有分区
+5、混合分区表可以跨内部和外部分区使用基于分区的优化，比如Static partition pruning/Dynamic partition pruning/Bloom pruning

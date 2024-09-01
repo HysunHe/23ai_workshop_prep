@@ -1,0 +1,5 @@
+问题： Exadata,安全,Exadata 是否遵循任何行业标准系统强化基准？
+解答： Exadata 开发遵循操作系统的安全技术实施指南 (STIG)，并将尽可能多的此类机制集成到基线版本中。
+具体参考文档：
+Exadata OL7 System Hardening for STIG Security Compliance (Doc ID 2614471.1)
+Oracle Exadata Database Machine OpenScap Guidelines and Best Practices (Doc ID 2793920.1)

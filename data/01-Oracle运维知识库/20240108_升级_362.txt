@@ -1,0 +1,5 @@
+问题： Exadata,升级,Exadata升级存储节点过程中发现griddisk ASMMODESTATUS状态为ONLINE，无法升级，请问如何解决？
+解答： 由于默认升级模式为non-rolling模式，在数据库和集群启动状态下griddisk被ASM实例使用，无法自动offline griddisk。
+解决方案：
+(1)使用-rolling参数，或者手工将需要升级的cell节点的griddisk的ASMMODESTATUS置为offline后再进行升级。
+(2)可以手工关闭数据库和CRS集群,然后再采用non-rolling方式升级。

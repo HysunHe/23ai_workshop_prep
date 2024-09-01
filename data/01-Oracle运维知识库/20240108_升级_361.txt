@@ -1,0 +1,2 @@
+问题： Exadata,升级,Exadata image升级后，发现Quorum disk丢失如何处理？
+解答： Exadata 计算节点操作系统版本从Oracle Linux 6升级到Oracle Linux 7时，可能会发生Quorum disk丢失情况。可以通过重建Quorum disk方式解决，详见MOS Doc ID 2453054.1。

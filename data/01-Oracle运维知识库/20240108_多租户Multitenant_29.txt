@@ -1,0 +1,2 @@
+问题： Oracle19c,多租户（Multitenant),同一个容器，但不同pdb 之间的表，如何直接访问？ 
+解答： CDB下不同pdb之间是隔离的，不同pdb之间访问表与non-CDB方式一样。 

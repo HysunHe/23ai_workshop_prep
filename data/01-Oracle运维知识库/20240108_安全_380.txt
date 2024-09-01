@@ -1,0 +1,3 @@
+问题： Exadata,安全,什么是自动硬盘擦洗和修复？
+解答： Oracle Exadata 系统软件会在硬盘空闲时定期自动检查和修复硬盘。 如果在硬盘上检测到坏扇区，Oracle Exadata 系统软件会自动向 Oracle ASM 发送请求，通过从另一个镜像副本读取数据来修复坏扇区。 默认情况下，硬盘清理每两周运行一次。
+最低软件：运行 Oracle Database 11g 第 2 版 (11.2) 11.2.0.4 版或 Oracle Database 12c 第 1 版 (12.1) 12.1.0.2 版的 Oracle Exadata 系统软件版本 11.2.3.3。

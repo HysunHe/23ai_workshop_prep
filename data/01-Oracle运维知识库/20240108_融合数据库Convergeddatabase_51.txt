@@ -1,0 +1,7 @@
+问题： Oracle19c,融合数据库（Converged database）,Oracle数据库哪些特性可以支持微服务架构？
+解答： • 创新的多租户架构允许微服务具有单独的数据库(PDB)，但仍将它们作为一个数据库(CDB)进行管理
+• Oracle Advanced Queuing消息队列为微服务提供事务性消息传递，不需要引入额外的消息队列
+• Oracle Rest Data Service快速开启数据的REST APIs
+• 真正的多模型引擎，支持关系，OLAP，JSON，XML，图形，空间
+• 物化视图，多分片和跨PDB查询支持实时分析
+• 业界领先的安全性，可伸缩性，分析和高可用性

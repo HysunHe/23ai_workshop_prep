@@ -1,0 +1,6 @@
+问题： Exadata,维护,如何更改 Exadata Cell 节点上的硬盘清理活动频率？
+
+解答： 使用如下命令：
+cellcli –e alter cell hardDiskScrubInterval=daily
+cellcli –e alter cell hardDiskScrubInterval=weekly
+cellcli –e alter cell hardDiskScrubInterval=biweekly

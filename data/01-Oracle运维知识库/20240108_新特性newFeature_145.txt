@@ -1,0 +1,14 @@
+问题： Oracle19c,新特性 （new Feature）,Oracle 19c 主要的新特性包括什么？
+解答： ①实时统计信息收集
+②自动化索引（Automatic indexing）
+③Active Data Guard 备库DML重定向
+④多租户PDB级别增强RAT和ADDM支持
+⑤自动SQL执行计划管理&SQL语句隔离(SQL
+Quarantine)
+⑥ 混合分区表（Hybrid Partitioned Tables）
+⑦多节点Redo Apply 和In-Memory Column Store
+特性可以同时启用
+⑧ 快速流式插入物联网数据
+⑨ 在Oracle、AWS 和Azure 云上的对象存储中
+执行SQL 查询和加载
+⑩SQL&JSON增强，多模数据库

@@ -1,0 +1,6 @@
+问题： Exadata,优化,EHCC 表的更新如何进行？
+解答： 当 EHCC 表中更新一行时，我们会在后台执行删除操作，然后插入该行。
+这样做时，行级别发生了两个主要变化：
+1、更新行的 ROWID 会发生变化，因为我们先执行了删除，然后执行了插入。
+2、更新的行不再是 EHCC 压缩，而是存储为 OLTP 压缩格式。有关更多详细信息，请参阅：
+文档 1332853.1 How Hybrid Columnar Compression Works When Rows are Inserted/Updated。

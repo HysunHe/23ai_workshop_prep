@@ -1,0 +1,6 @@
+问题： Exadata,DBaaS,Exadata是否支持网络资源管理？
+解答： 网络资源管理通过 InfiniBand 结构自动、透明地确定关键数据库网络消息的优先级，确保延迟关键操作的快速响应时间。 在数据库、数据库 InfiniBand 适配器、Oracle Exadata 存储服务器软件、Exadata 存储 InfiniBand 适配器和 InfiniBand 交换机中实施优先级，以确保在整个 InfiniBand 结构中实现优先级。
+对延迟敏感的消息（例如 Oracle RAC Cache Fusion 消息）的优先级高于批处理、报告和备份消息。 日志文件写入操作被赋予最高优先级，以确保事务处理的低延迟。
+此功能与 CPU 和 I/O 资源管理结合使用，有助于确保整合环境中的高性能和可预测的性能。 例如，给定在线事务处理 (OLTP) 工作负载，提交延迟由日志写入延迟决定。 此功能使日志写入进程 (LGWR) 网络传输的优先级高于同一个或其他数据库中的其他数据库流量，例如备份或报告。
+该功能默认启用，无需配置或管理。
+最低软件：运行 Oracle Database 11g Release 2 (11.2) 版本 11.2.0.4 的 Oracle Exadata 存储服务器软件版本 11.2.3.3 或 Oracle Database 12c Release 1 (12.1) 版本 12.1.0.1 以及交换机固件版本 2.1.3-4

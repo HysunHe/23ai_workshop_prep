@@ -1,0 +1,5 @@
+问题： Exadata,优化,CTAS 可以用于创建 EHCC 表吗？
+解答： 是的，CTAS 可用于创建 EHCC 表。
+例子 ：
+SQL> create table example compress for query high as select * from example2;
+在此示例中，“compress for query high”专属于 EHCC，它将创建启用EHCC压缩的表。

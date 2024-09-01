@@ -1,0 +1,6 @@
+问题： Oracle19c,性能（performance）,什么是SQL Performance Analyzer
+解答： •帮助用户预测系统更改对SQL 工作负载的影响
+• 在生产系统上以低开销捕获SQL 工作负载到SQL 优化集（STS）
+• 测试和衡量对实际生产SQL 语句响应时间的影响
+• 识别所有执行计划改变和（或）回归
+• 与STS、SQL Plan Baselines 和SQL Tuning Advisor 集成，形成端到端解决方案

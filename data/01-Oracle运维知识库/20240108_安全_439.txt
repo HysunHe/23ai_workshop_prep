@@ -1,0 +1,5 @@
+问题： Exadata,安全,对于 Exadata 的总体安全性，还有其他保证吗？
+解答： Oracle Exadata 数据库服务器最高安全架构演示中的安全功能。
+https://www.oracle.com/a/tech/docs/exadata-maximum-security-architecture.pdf
+Oracle Gen2 Exadata Cloud@Customer 强调了合规性、安全性、访问控制和审计功能，有助于防止未经授权的系统访问和使用。
+https://www.oracle.com/a/ocom/docs/engineered-systems/exadata/exadata-cloud-at-customer-security-controls.pdf

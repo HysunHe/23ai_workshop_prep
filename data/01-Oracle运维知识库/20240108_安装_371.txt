@@ -1,0 +1,2 @@
+问题： Exadata,安装,Exadata是否支持主机和ILOM不使用同一网络？
+解答： 以前，Exadata 服务器和 Integrated Lights Out Manager (ILOM) 需要使用相同的管理网络才能使某些功能正常运行，例如 Oracle Exadata 系统软件中的警报通知。 Oracle Exadata 系统软件版本 19.1.0 或更高版本消除了这种网络依赖性，同时保留了以前支持的所有功能。
