@@ -418,50 +418,66 @@ curl http://150.230.37.250:8098/v1/chat/completions \
 
 ### 直接与LLM对话（非RAG)
 
+先运行如下语句，打开输出信息，这样dbms_output就能在脚本输出窗口中输出打印信息了。
+
 ```sql
 SET SERVEROUTPUT ON;
+```
 
+以下PL/SQL代码是执行 RAG 的过程，也可以用其它语言实现，步骤或逻辑都一样。
+
+```sql
 declare
-    v_req       utl_http.req;
-    v_res       utl_http.resp;
-    jo          JSON_OBJECT_T;
-    ja          JSON_ARRAY_T;
-    l_resp      CLOB;
-    llm_result  CLOB;
-    v_buffer    varchar2(4000); 
-    v_body      varchar2(4000) := '{
-    "model": "Qwen2-7B-Instruct",
-    "messages": [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "Tell me something about large language models."}
-    ]
-    }'; 
+    l_question varchar2(500) := 'Oracle 23ai 新特性';
+    l_input CLOB;
+    l_clob  CLOB;
+    j apex_json.t_values;
+    l_embedding CLOB;
+    l_context   CLOB;
+    l_rag_result CLOB;
 begin
-    -- Set connection.
-    v_req := utl_http.begin_request('http://150.230.37.250:8098/v1/chat/completions', 'POST');
-    utl_http.set_header(v_req, 'content-type', 'application/json'); 
-    utl_http.set_header(v_req, 'Content-Length', length(v_body));
+    apex_web_service.g_request_headers(1).name :=  'Content-Type';
+    apex_web_service.g_request_headers(1).value := 'application/json';
+    l_input := '{"text": "' || l_question || '"}';
     
-    -- Invoke REST API.
-    utl_http.write_text(v_req, v_body);
-  
-    -- Get response.
-    v_res := utl_http.get_response(v_req);
-    begin
-        loop
-            utl_http.read_line(v_res, v_buffer);
-            l_resp := l_resp || v_buffer;
-        end loop;
-        utl_http.end_response(v_res);
-    exception
-        when utl_http.end_of_body then
-            utl_http.end_response(v_res);
-    end;
+    -- 第一步：向量化用户问题
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8099/workshop/embedding',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob);   
+    l_embedding := apex_json.get_varchar2(p_path => 'data.embedding', p_values => j);
+    dbms_output.put_line('*** embedding: ' || l_embedding);
     
-    jo := JSON_OBJECT_T.parse(l_resp);
-    llm_result := JSON_OBJECT_T(jo.get_Array('choices').get(0)).get_Object('message').get_Clob('content');
+    -- 第二步：从向量数据库中检索出与问题相似的内容
+    for rec in (select document, json_value(cmetadata, '$.source') as src_file
+        from lab_vecstore_hysun
+        where dataset_name='oracledb_docs'
+        order by VECTOR_DISTANCE(embedding, to_vector(l_embedding))
+        FETCH APPROX FIRST 3 ROWS ONLY) loop
+        l_context := l_context || rec.document || chr(10);
+    end loop;
     
-    dbms_output.put_line(llm_result);
+    -- 第三步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
+    l_input := '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请根据下列的上下文信息，回答用户的问题。\n 以下是上下文信息：' || replace(l_context, chr(10), '\n') || '"},
+            {"role": "user", "content": "' || l_question || '"}
+        ]
+    }';
+    
+    -- 第四步：调用大语言模型，生成RAG结果
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8098/v1/chat/completions',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob); 
+    l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
+    
+    dbms_output.put_line('*** RAG Result: ' || chr(10) || l_rag_result);
 end;
 /
 ```
