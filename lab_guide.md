@@ -14,7 +14,7 @@
 2. Oracle SQL Developer 23+
 3. API 调用工具，比如 curl、postman 等等都可以。
 
-## 初识Oracle的向量操作
+## 快速一览
 
 VECTOR_DISTANCE(v1, v2, 距离策略) 是向量检索的关键操作，用来比较两个向量的距离（相似度）。距离越大，说明相似度越小；反之，说明两个向量越相似。
 
@@ -38,11 +38,11 @@ SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,5]'), COSINE) as distance;
 
 ## Oracle向量数据库基本操作
 
-### 建表
+### 向量类型字段及样例表
 
 Oracle 23ai 引入了向量数据类型：VECTOR (dimentions, format)，该类型可指定两个参数，第一个是向量的维度，如 [2,2] 是一个二维向量；第二个是数据格式，如 FLOAT32。也可以不指定。
 
-建立一个测试表 galaxies（为避免多人实验冲突，建议表名中加入自己的名字）:
+建立一个测试表 galaxies（为避免多人实验冲突，**建议表名中加入自己的名字**）:
 
 ```sql
 create table galaxies_hysun (
@@ -146,7 +146,7 @@ WITH TARGET ACCURACY 90
 parallel 2;
 ```
 
-创建 IVF 索引时，我们可以指定目标准确率 target accuracy，并行执行；还可以指定 partition 数量。关于 IVF 参数的说明，可以参考如下文档：
+创建 IVF 索引时，我们可以指定目标准确率 target accuracy、并行执行参数，还可以指定 partition 数量等参数。关于 IVF 参数的说明，可以参考如下文档：
 https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (196页)
 
 ### IVF 近似检索
@@ -218,7 +218,7 @@ CREATE TABLE lab_vecstore_hysun (
 
 源数据集：讲师展示源数据集。
 
-接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中）：
+接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中）（API参数中注意用自己的表名）：
 
 ```shell
    curl -X 'POST'
@@ -231,7 +231,7 @@ CREATE TABLE lab_vecstore_hysun (
     }'
 ```
 
-可能需要2~3分钟的时间等待 API 执行完成。
+等待 API 执行完成。
 
 API 执行完成后，请检查表中的数据（请注意用自己的表名）：
 
@@ -439,7 +439,59 @@ begin
     apex_web_service.g_request_headers(1).name :=  'Content-Type';
     apex_web_service.g_request_headers(1).value := 'application/json';
     l_input := '{"text": "' || l_question || '"}';
-    
+  
+    -- 第一步：提示工程：给大语言模型明确的指示
+    l_input := '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请回答用户提出的问题。"},
+            {"role": "user", "content": "' || l_question || '"}
+        ]
+    }';
+  
+    -- 第三步：调用大语言模型，生成RAG结果
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://150.230.37.250:8098/v1/chat/completions',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob); 
+    l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
+  
+    dbms_output.put_line('*** Result: ' || chr(10) || l_rag_result);
+end;
+/
+```
+
+运行结果：
+
+![1725247018140](image/lab_guide/1725247018140.png)
+
+
+### RAG方式与LLM对话
+
+先运行如下语句，打开输出信息，这样dbms_output就能在脚本输出窗口中输出打印信息了。
+
+```sql
+SET SERVEROUTPUT ON;
+```
+
+以下PL/SQL代码是执行 RAG 的过程，也可以用其它语言实现，步骤或逻辑都一样。
+
+```sql
+declare
+    l_question varchar2(500) := 'Oracle 23ai 新特性';
+    l_input CLOB;
+    l_clob  CLOB;
+    j apex_json.t_values;
+    l_embedding CLOB;
+    l_context   CLOB;
+    l_rag_result CLOB;
+begin
+    apex_web_service.g_request_headers(1).name :=  'Content-Type';
+    apex_web_service.g_request_headers(1).value := 'application/json';
+    l_input := '{"text": "' || l_question || '"}';
+  
     -- 第一步：向量化用户问题
     l_clob := apex_web_service.make_rest_request(
         p_url => 'http://146.235.226.110:8099/workshop/embedding',
@@ -448,8 +500,8 @@ begin
     );
     apex_json.parse(j, l_clob);   
     l_embedding := apex_json.get_varchar2(p_path => 'data.embedding', p_values => j);
-    dbms_output.put_line('*** embedding: ' || l_embedding);
-    
+    -- dbms_output.put_line('*** embedding: ' || l_embedding);
+  
     -- 第二步：从向量数据库中检索出与问题相似的内容
     for rec in (select document, json_value(cmetadata, '$.source') as src_file
         from lab_vecstore_hysun
@@ -458,16 +510,16 @@ begin
         FETCH APPROX FIRST 3 ROWS ONLY) loop
         l_context := l_context || rec.document || chr(10);
     end loop;
-    
+  
     -- 第三步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
     l_input := '{
         "model": "Qwen2-7B-Instruct",
         "messages": [
-            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请根据下列的上下文信息，回答用户的问题。\n 以下是上下文信息：' || replace(l_context, chr(10), '\n') || '"},
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请仅仅根据提供的上下文信息内容，回答用户的问题，且不要试图编造答案。\n 以下是上下文信息：' || replace(l_context, chr(10), '\n') || '"},
             {"role": "user", "content": "' || l_question || '"}
         ]
     }';
-    
+  
     -- 第四步：调用大语言模型，生成RAG结果
     l_clob := apex_web_service.make_rest_request(
         p_url => 'http://146.235.226.110:8098/v1/chat/completions',
@@ -476,8 +528,12 @@ begin
     );
     apex_json.parse(j, l_clob); 
     l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
-    
+  
     dbms_output.put_line('*** RAG Result: ' || chr(10) || l_rag_result);
 end;
 /
 ```
+
+运行结果：
+
+![1725246880358](image/lab_guide/1725246880358.png)
