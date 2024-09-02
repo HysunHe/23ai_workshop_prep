@@ -386,13 +386,17 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 从魔搭社区 (modelscope) 下载：[Qwen2-7B-Instruct](https://www.modelscope.cn/models/qwen/Qwen2-7B-Instruct)
 
-#### 部署模型
+#### 用vLLM部署模型（GPU）
 
-我们采用vLLM来部署模型。vLLM是一个模型加速库，能大幅提升推理效率。
+在GPU机器上可以采用vLLM来部署模型。vLLM是一个模型加速库，能大幅提升推理效率及并发。
 
-安装 vLLM：
+安装Python环境及vLLM工具：
 
 ```shell
+conda create -n vllm python=3.12
+
+conda activate vllm
+
 pip install vllm
 ```
 
@@ -408,11 +412,43 @@ pip install vllm
 curl http://150.230.37.250:8098/v1/chat/completions \
     -H "Content-Type: application/json" \
     -d '{
-    "model": "Qwen2-7B-Instruct",
-    "messages": [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "Tell me something about large language models."}
-    ]
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me something about large language models."}
+        ]
+    }'
+```
+
+#### 用Ollama部署模型
+
+开发测试也可以采用Ollama来部署模型，可以在CPU机器上运行模型。
+
+安装 ollama：
+
+```shell
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+启动运行：
+
+```shell
+export OLLAMA_HOST=0.0.0.0:8098
+
+ollama run qwen2:7b-instruct
+```
+
+#### 测试部署是否成功：
+
+```shell
+curl http://150.230.37.250:8098/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "qwen2:7b-instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me something about large language models."}
+        ]
     }'
 ```
 
