@@ -1,3 +1,7 @@
+---
+marp: true
+---
+
 # Oracle向量数据库动手实验
 
 本实验以熟悉Oracle向量数据库的一些实际操作为主要目的，主要内容包括 Oracle向量数据类型、向量模型、数据向量化（库外向量化与库内向量化两种方式）、向量索引（HNSW和IVF）、向量检索（非索引精确检索和索引近似检索）、RAG。
@@ -449,7 +453,7 @@ begin
         ]
     }';
   
-    -- 第三步：调用大语言模型，生成RAG结果
+    -- 第二步：调用大语言模型，生成RAG结果
     l_clob := apex_web_service.make_rest_request(
         p_url => 'http://150.230.37.250:8098/v1/chat/completions',
         p_http_method => 'POST',
@@ -466,7 +470,6 @@ end;
 运行结果：
 
 ![1725247018140](image/lab_guide/1725247018140.png)
-
 
 ### RAG方式与LLM对话
 
