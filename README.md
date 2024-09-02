@@ -1,6 +1,6 @@
 # Oracle 23ai workshop - 向量数据库
 
-## Embedding模型部署（CPU)
+## Embedding模型部署（CPU）
 
 考虑到硬件资源因素，没有足够的资源让每个人都部署一份模型，因此，本操作仅由讲师完成。讲师将向量嵌入模型部分为REST API 的方式，供大家调用。
 

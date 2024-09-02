@@ -1,7 +1,3 @@
----
-marp: true
----
-
 # Oracle向量数据库动手实验
 
 本实验以熟悉Oracle向量数据库的一些实际操作为主要目的，主要内容包括 Oracle向量数据类型、向量模型、数据向量化（库外向量化与库内向量化两种方式）、向量索引（HNSW和IVF）、向量检索（非索引精确检索和索引近似检索）、RAG。
@@ -428,7 +424,7 @@ curl http://150.230.37.250:8098/v1/chat/completions \
 SET SERVEROUTPUT ON;
 ```
 
-以下PL/SQL代码是执行 RAG 的过程，也可以用其它语言实现，步骤或逻辑都一样。
+以下PL/SQL代码是直接调用LLM API的过程，也可以用其它语言实现，步骤或逻辑都一样。
 
 ```sql
 declare
