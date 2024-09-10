@@ -572,3 +572,96 @@ end;
 运行结果：
 
 ![1725246880358](image/lab_guide/1725246880358.png)
+
+## Oracle 库内向量化流水线操作（可选）
+
+本节主要目的在于：了解在Oracle库内实现一个完整的从源文件到生成向量数据 这样一个库内流水线操作：PDF文件 --> 文件文件 --> 文件分块 --> 生成向量数据。
+
+
+![1725959039839](image/Oracle向量数据库_lab/1725959039839.png)
+
+Oracle 数据库提供了一系列的工具方法，以方便向量的操作。这些方法主要封装在 DBMS_VECTOR / DBMS_VECTOR_CHAIN 这两个包中，可以直接调用。例如：
+
+* dbms_vector_chain.utl_to_text：将文件转换为文本格式，如PDF格式转换为文本格式。
+* dbms_vector_chain.utl_to_chunks: 将文档以块的形式拆分成多个块
+* dbms_vector_chain.utl_to_embeddings：将文档块进行向量化（批量形式）。
+
+对于【PDF文件 --> 文件文件 --> 文件分块 --> 向量化】这样一个复杂的过程，利用上面这些工具方法，在Oracle数据库中仅通过一条SQL语句即可实现。下面我们展示一下这个过程：
+
+### 先准备数据表
+
+```sql
+-- 用来加载存储源文件
+create table RAG_FILES (
+    file_name varchar2(500), 
+    file_content BLOB
+);
+
+-- 用来存储文件块以及对象的向量
+create table RAG_INDB_PIPELINE (
+    id number, 
+    name varchar2(50), 
+    doc varchar2(500), 
+    embedding VECTOR
+);
+```
+
+### 加载文件
+
+加载文件有多种方式，比如从对象存储中加载、从文件服务器加载等等。为简单起见，本实验中预先将一个PDF文件上传到数据库服务器上，从本地目录加载文件。
+
+```sql
+-- 首先，将文件手工上传至 /u01/hysun/rag_docs 目录
+
+-- 然后再创建数据库目录，如下
+create or replace directory RAG_DOC_DIR as '/u01/hysun/rag_docs';
+
+-- 从数据目录下加载源文件入库
+insert into RAG_FILES(file_name, file_content) values('oracle-vector-lab', to_blob(bfilename('RAG_DOC_DIR', 'Oracle向量数据库_lab.pdf')));
+commit;
+
+```
+
+### 执行 文件转换-->文档拆分-->向量化
+
+以下用一条SQL完成了【PDF格式 -> 文本格式 -> 文档分块 -> 向量化】这样一个比较复杂的流程：
+
+```sql
+insert into rag_doc_chunks
+select 
+    dt.file_name doc_id, 
+    et.embed_id chunk_id, 
+    et.embed_data chunk_data, 
+    to_vector(et.embed_vector) chunk_embedding
+from
+    rag_files dt,
+    dbms_vector_chain.utl_to_embeddings(
+        dbms_vector_chain.utl_to_chunks(
+            dbms_vector_chain.utl_to_text(dt.file_content),
+            json('{"normalize":"all"}')
+        ),
+        json('{"provider":"database", "model":"mydoc_model"}')
+    ) t,
+    JSON_TABLE(
+        t.column_value, 
+        '$[*]' COLUMNS (
+            embed_id NUMBER PATH '$.embed_id', 
+            embed_data VARCHAR2(4000) PATH '$.embed_data', 
+            embed_vector CLOB PATH '$.embed_vector'
+        )
+    ) et;
+commit;
+```
+
+### 向量相似度检索
+
+源数据完成向量化后，就可以利用 VECTOR_DISTANCE 进行向量相似度检索了。
+
+```sql
+select 
+    chunk_data，
+    VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING '本次实验的先决条件' as data), COSINE) as distance
+from rag_doc_chunks
+order by distance
+FETCH APPROX FIRST 1 ROWS ONLY;
+```
