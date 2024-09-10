@@ -659,9 +659,8 @@ commit;
 
 ```sql
 select 
-    chunk_data，
-    VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING '本次实验的先决条件' as data), COSINE) as distance
+    chunk_data
 from rag_doc_chunks
-order by distance
-FETCH APPROX FIRST 1 ROWS ONLY;
+order by VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING '本次实验的先决条件' as data), COSINE)
+FETCH FIRST 1 ROWS ONLY;
 ```
