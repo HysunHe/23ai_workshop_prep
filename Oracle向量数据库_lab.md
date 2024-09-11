@@ -5,14 +5,14 @@
 ## 前提条件
 
 1. 本实验重点在于动手操作，非对向量数据库及Oracle向量数据库进行理论上的讲解，因此，需要参与者对向量数据库及Oracle向量数据库有一个基本的概念上的了解。
-2. 有基本的PL/SQL知识，能够看简单的PL/SQL示例代码，能够利用客户端（如SQL Developer）等运行提供的PL/SQL示例代码。
+2. 有基本的PL/SQL知识，能够看简单的PL/SQL示例代码，能够利用客户端（如sqlplus）等运行提供的PL/SQL示例代码。
 3. 有基本的Python知识，能够看懂简单的Python示例代码。
 
 ## 环境准备
 
 1. Oracle 23ai 数据库
-2. Oracle SQL Developer 23+
-3. API 调用工具，比如 curl、postman 等等都可以。
+2. SQLcl 24.2+
+3. API 调用工具，比如 curl。
 
 ## 快速一览
 
