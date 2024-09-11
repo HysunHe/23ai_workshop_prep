@@ -42,10 +42,10 @@ SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,5]'), COSINE) as distance;
 
 Oracle 23ai 引入了向量数据类型：VECTOR (dimentions, format)，该类型可指定两个参数，第一个是向量的维度，如 [2,2] 是一个二维向量；第二个是数据格式，如 FLOAT32。也可以不指定。
 
-建立一个测试表 galaxies（为避免多人实验冲突，**建议表名中加入自己的名字**）:
+建立一个测试表 galaxies:
 
 ```sql
-create table galaxies_hysun (
+create table galaxies (
     id number, 
     name varchar2(50), 
     doc varchar2(500), 
@@ -53,22 +53,22 @@ create table galaxies_hysun (
 );
 ```
 
-### 插入样例数据（请注意用自己的表名）
+### 插入样例数据
 
 ```sql
-insert into galaxies_hysun values (1, 'M31', 'Messier 31 is a barred spiral galaxy in the Andromeda constellation.', '[0,2,2,0,0]');
-insert into galaxies_hysun values (2, 'M33', 'Messier 33 is a spiral galaxy in the Triangulum constellation.', '[0,0,1,0,0]');
-insert into galaxies_hysun values (3, 'M58', 'Messier 58 is an intermediate barred spiral galaxy in the Virgo constellation.', '[1,1,1,0,0]');
-insert into galaxies_hysun values (4, 'M63', 'Messier 63 is a spiral galaxy in the Canes Venatici constellation.', '[0,0,1,0,0]');
-insert into galaxies_hysun values (5, 'M77', 'Messier 77 is a barred spiral galaxy in the Cetus constellation.', '[0,1,1,0,0]');
-insert into galaxies_hysun values (6, 'M91', 'Messier 91 is a barred spiral galaxy in the Coma Berenices constellation.', '[0,1,1,0,0]');
-insert into galaxies_hysun values (7, 'M49', 'Messier 49 is a giant elliptical galaxy in the Virgo constellation.', '[0,0,0,1,1]');
-insert into galaxies_hysun values (8, 'M60', 'Messier 60 is an elliptical galaxy in the Virgo constellation.', '[0,0,0,0,1]');
-insert into galaxies_hysun values (9, 'NGC1073', 'NGC 1073 is a barred spiral galaxy in Cetus constellation.', '[0,1,1,0,0]'); 
+insert into galaxies values (1, 'M31', 'Messier 31 is a barred spiral galaxy in the Andromeda constellation.', '[0,1,1,0,0]');
+insert into galaxies values (2, 'M33', 'Messier 33 is a spiral galaxy in the Triangulum constellation.', '[0,0,1,0,0]');
+insert into galaxies values (3, 'M58', 'Messier 58 is an intermediate barred spiral galaxy in the Virgo constellation.', '[1,1,1,0,0]');
+insert into galaxies values (4, 'M63', 'Messier 63 is a spiral galaxy in the Canes Venatici constellation.', '[0,0,1,0,0]');
+insert into galaxies values (5, 'M77', 'Messier 77 is a barred spiral galaxy in the Cetus constellation.', '[0,2,2,0,0]');
+insert into galaxies values (6, 'M91', 'Messier 91 is a barred spiral galaxy in the Coma Berenices constellation.', '[0,3,3,0,0]');
+insert into galaxies values (7, 'M49', 'Messier 49 is a giant elliptical galaxy in the Virgo constellation.', '[0,0,0,1,1]');
+insert into galaxies values (8, 'M60', 'Messier 60 is an elliptical galaxy in the Virgo constellation.', '[0,0,0,0,1]');
+insert into galaxies values (9, 'NGC1073', 'NGC 1073 is a barred spiral galaxy in Cetus constellation.', '[0,3,3,0,0]'); 
 commit;
 ```
 
-### 执行向量精确检索（Exact Search）
+### 向量精确检索（Exact Search）
 
 向量精确检索类似于关系数据查询时的全表扫描，是指库中的每一个向量都与查询向量进行匹配，这样就能计算出每个向量与查询向量之间的相似度，从而精确的返回与查询向量最相似的 N 条记录，不会漏掉任何一条记录（也就是说，召回率始终能达到 100%）.
 
@@ -76,16 +76,35 @@ commit;
 
 在使用如Oracle这类融合数据库时，很多情况下，可以使用关系数据的业务属性字段（标量字段）缩小需要进行向量匹配的数据，因此，结合关系数据库特征，可以很大程序上提高向量检索的精确性和性能。
 
-SQL 查询语句：利用余弦策略检索出与向量 [0,1,1,0,0] 最相近的3条记录（请注意用自己的表名）：
+SQL 查询语句：利用余弦策略检索出与向量 [0,1,1,0,0] 最相近的3条记录：
 
 ```sql
-SELECT name
-FROM galaxies_hysun
+SELECT *
+FROM galaxies
 ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
 FETCH FIRST 3 ROWS ONLY;
 ```
 
-### 执行向量近似检索（Approximate Search）
+查询结果：
+
+![galaxies_exact_search](image/galaxies_exact_search.png)
+
+查看执行计划：
+
+```sql
+EXPLAIN PLAN FOR
+SELECT *
+FROM galaxies
+ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
+FETCH FIRST 3 ROWS ONLY;
+
+select plan_table_output from table(dbms_xplan.display('plan_table',null,'all'));
+
+```
+
+![galaxies_exact_search_exec_plan](image/galaxies_exact_search_exec_plan.png)
+
+### 向量近似检索（Approximate Search）
 
 精确检索获得了最高的准确率，但需要遍历所有向量数据集，因此，在向量数据集比较大时，性能很可能会成为问题。向量检索中，准确率和性能之间，往往需要寻找一个平衡。在大数据集上，为了提高性能，利用索引进行向量近似检索是常用的方式。
 
@@ -93,15 +112,15 @@ FETCH FIRST 3 ROWS ONLY;
 
 ### 创建HNSW索引
 
-创建IV索引语句（请注意用自己的表名和索引名）：
+创建IV索引语句：
 
 ```sql
-CREATE VECTOR INDEX galaxies_hysun_hnsw_idx ON galaxies_hysun (embedding)
+CREATE VECTOR INDEX galaxies_hnsw_idx ON galaxies (embedding)
 ORGANIZATION INMEMORY NEIGHBOR GRAPH
 DISTANCE COSINE
-WITH TARGET ACCURACY 90
+WITH TARGET ACCURACY 90;
 -- PARAMETERS (type HNSW, neighbors 32, efconstruction 200)
-parallel 2;
+-- parallel 2;
 ```
 
 创建 HNSW 索引时，我们可以指定目标准确率 target accuracy，并行执行；还可以指定 HNSW 的参数 M (即 neighbors) 和 efConstruction (如上面注释掉的 Parameters 一行)。关于 HNSW 相关参数的说明可以参考如下文档：
@@ -110,40 +129,52 @@ https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswpar
 
 ### HNSW 近似检索
 
-查询SQL（请注意用自己的表名）:
+查询SQL:
 
 ```sql
-SELECT name
-FROM galaxies_hysun
+SELECT *
+FROM galaxies
 ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
 FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
 查询结果：
 
-![1724920167380](image/lab/1724920167380.png)
+![galaxies_approx_search](image/galaxies_approx_search.png)
 
-在 SQL Developer 中显示 执行计划：
 
-![1724920180162](image/lab/1724920180162.png)
+查看执行计划：
+
+```sql
+EXPLAIN PLAN FOR
+SELECT *
+FROM galaxies
+ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
+FETCH APPROX FIRST 3 ROWS ONLY;
+
+select plan_table_output from table(dbms_xplan.display('plan_table',null,'all'));
+
+```
+
+![galaxies_approx_search_exec_plan](image/galaxies_approx_search_exec_plan.png)
 
 ### 创建IVF索引
 
-如果之前已经在对应的列上创建了向量索引，那么先将其删除，如（请注意用自己的索引名）：
+如果之前已经在对应的列上创建了向量索引，那么先将其删除，如：
 
 ```sql
-drop index galaxies_hysun_hnsw_idx;
+drop index galaxies_hnsw_idx;
 ```
 
-创建IV索引语句（请注意用自己的索引名）：
+创建IV索引语句：
 
 ```sql
-CREATE VECTOR INDEX galaxies_hysun_ivf_idx ON galaxies_hysun (embedding)
+CREATE VECTOR INDEX galaxies_ivf_idx ON galaxies(embedding)
 ORGANIZATION NEIGHBOR PARTITIONS
 DISTANCE COSINE
-WITH TARGET ACCURACY 90
+WITH TARGET ACCURACY 90;
 -- PARAMETERS (type IVF, neighbor partitions 32)
-parallel 2;
+-- parallel 2;
 ```
 
 创建 IVF 索引时，我们可以指定目标准确率 target accuracy、并行执行参数，还可以指定 partition 数量等参数。关于 IVF 参数的说明，可以参考如下文档：
@@ -151,14 +182,35 @@ https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-ve
 
 ### IVF 近似检索
 
-创建了IVF索引之后，我们利用索引进行近似检索（注：由于我们的实验用的数据集很小，所以优化器很可能不会选择走IVF索引）（请注意用自己的表名）
+创建了IVF索引之后，我们利用索引进行近似检索（注：由于我们的实验用的数据集很小，所以优化器很可能不会选择走IVF索引）
 
 ```sql
-SELECT name
-FROM galaxies_hysun
+SELECT /*+ VECTOR_INDEX_TRANSFORM(galaxies galaxies_ivf_idx) */ *
+FROM galaxies
 ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
 FETCH APPROX FIRST 3 ROWS ONLY;
 ```
+
+查询结果：
+
+![galaxies_approx_search](image/galaxies_approx_search.png)
+
+
+查看执行计划：
+
+```sql
+EXPLAIN PLAN FOR
+SELECT /*+ VECTOR_INDEX_TRANSFORM(galaxies galaxies_ivf_idx) */ *
+FROM galaxies
+ORDER BY VECTOR_DISTANCE( embedding, to_vector('[0,1,1,0,0]'), COSINE )
+FETCH APPROX FIRST 3 ROWS ONLY;
+
+select plan_table_output from table(dbms_xplan.display('plan_table',null,'all'));
+
+```
+
+![galaxies_ivf_search_exec_plan](image/galaxies_ivf_search_exec_plan.png)
+
 
 ## 向量嵌入模型
 
@@ -168,7 +220,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ### 向量嵌入模型部署（仅讲师操作）
 
-考虑到硬件资源因素，没有足够的资源让每个人都部署一份模型，因此，本操作仅由讲师完成。讲师将向量嵌入模型部分为REST API 的方式，供大家调用；同时提供源代码，并提供讲解。
+考虑到硬件资源因素，没有足够的资源让每个人都部署一份模型，因此，本操作仅由讲师完成。讲师将向量嵌入模型部分为REST API 的方式，供大家调用；同时展示源代码并讲解。
 
 ### 向量嵌入模型访问
 
@@ -182,7 +234,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
-    "text": "Oracle 23ai 新特性"
+        "text": "<需要向量化的文本>"
     }'
    ```
 2. 批量数据准备API（后续用到）
@@ -193,8 +245,10 @@ FETCH APPROX FIRST 3 ROWS ONLY;
     -H 'accept: application/json'
     -H 'Content-Type: application/json'
     -d '{
+        "db_user": "<数据库用户名>",
+        "db_password": "<数据库用户密码>",
         "table_name": "<表名>",
-        "dataset_name": "oracledb_docs"
+        "dataset_name": "<数据集名称>"
     }'
    ```
 
@@ -202,10 +256,10 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 库外向量化指源数据由外部程序向量化之后，再插入或加载到数据库表中。在本例中，我们将使用 Python 程序将文本数据向量化之后，再调用Oracle客户包将数据插入到数据库中。这是常用的一种方法，操作方式也与平时的数据加载操作一致。
 
-为了让接下来的实验更接近真实场景，我们将创建另一张表 lab_vecstore（为避免多人实验冲突，建议表名中加入自己的名字）：
+为了让接下来的实验更接近真实场景，我们将创建另一张表 lab_vecstore：
 
 ```sql
-CREATE TABLE lab_vecstore_hysun (
+CREATE TABLE lab_vecstore (
     id VARCHAR2(50) DEFAULT SYS_GUID() PRIMARY KEY,
     dataset_name VARCHAR2(50) NOT NULL,
     document CLOB,
@@ -214,70 +268,74 @@ CREATE TABLE lab_vecstore_hysun (
 );
 ```
 
-这里我们没有指定向量的维度，但指定了数据类型格式是 FLOAT32，与向量模型的输出一致。
+这里我们没有指定向量的维度，但指定了数据类型格式是 FLOAT32，与向量模型的输出一致。下面我们将源数据文件（源数据集）加载进lab_vecstore表。
 
 源数据集：讲师展示源数据集。
 
-接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中）（API参数中注意用自己的表名）：
+接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中）：
 
 ```shell
-   curl -X 'POST'
-    'http://<ip>:<port>/workshop/prepare-data'
-    -H 'accept: application/json'
-    -H 'Content-Type: application/json'
+curl -X 'POST' \
+    'http://146.235.226.110:8099/workshop/prepare-data' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
     -d '{
-        "table_name": "<表名>",
+        "db_user": "<你的数据库用户名>",
+        "db_password": "<密码>",
+        "table_name": "lab_vecstore",
         "dataset_name": "oracledb_docs"
     }'
 ```
 
-等待 API 执行完成。
-
-API 执行完成后，请检查表中的数据（请注意用自己的表名）：
+API 执行完成后，可以查看一下表中的数据：
 
 ```sql
-select document, embedding, json_value(cmetadata, '$.source') as src_file from lab_vecstore_hysun;
+-- 本数据集总共有231条记录
+select count(*) from lab_vecstore;  
 
-select count(*) from lab_vecstore_hysun;  -- 231 条
+-- 查看一条数据
+select json_value(cmetadata, '$.source') as src_file, embedding 
+from lab_vecstore
+where rownum < 2;
 ```
 
-![1724925315515](image/lab/1724925315515.png)
+![data_prepare_check](image/data_prepare_check.png)
 
-获得上述结果，说明数据已经向量化完成，并且成功入库了。（讲师展示并讲解外部向量化的源代码）
+至此，源数据集已经向量化完成，并且成功入库了。（讲师展示并讲解外部向量化的源代码）
 
 ### 向量检索
 
-要检索的文本：Oracle 23ai 新特性
+本实验中，我们使用 “Oracle 23ai 新特性” 这个文本进行相似度检索。
 
 第一步，先将要检索的文本在库外向量化。我们调用上述提供的API完成这一步。API将返回向量数据。
 
 ```shell
 curl -X 'POST' \
-  'http://<ip>:<port>/workshop/embedding' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "text": "Oracle 23ai 新特性"
-}'
+    'http://146.235.226.110:8099/workshop/embedding' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "text": "Oracle 23ai 新特性"
+    }'
 ```
 
-第二步，执行 SQL 语句检索相似的数据，将上一步中返回的查询向量传入到VECTOR_DISTANCE函数中（请注意用自己的表名）：
+第二步，执行 SQL 语句检索相似的数据，将上一步中返回的向量传入到VECTOR_DISTANCE函数中：
 
 ```sql
 select document, json_value(cmetadata, '$.source') as src_file
-from lab_vecstore_hysun
+from lab_vecstore
 where dataset_name='oracledb_docs'
 order by VECTOR_DISTANCE(embedding, to_vector('[0.8165184855461121, 0.9929913878440857, 0.60514235496521,...]'))
-FETCH APPROX FIRST 3 ROWS ONLY;
+FETCH FIRST 3 ROWS ONLY;
 ```
 
-![1724926466173](image/lab/1724926466173.png)
+![query_with_dataset](image/query_with_dataset.png)
 
-## 库内向量化操作
+## 库内向量化操作（仅讲师操作）
 
 Oracle 数据库提供了库内向量化的特性，其允许用户导入向量嵌入模型到数据库中，然后可以直接在SQL中对数据进行向量化操作，无需依赖外部的程序，这种方式很大程序的简化了向量数据的加载和检索，非常方便。
 
-### 导入向量嵌入模型（仅讲师操作）
+### 导入向量嵌入模型
 
 考虑到硬件资源因素，没有足够的资源让每个人都加载一份模型，因此，本操作仅由讲师完成。讲师展示加载操作，并提供讲解。
 
@@ -285,22 +343,25 @@ Oracle 数据库提供了库内向量化的特性，其允许用户导入向量�
 
 ```sql
 -- 这一步需要有授权：
--- grant execute on DBMS_CLOUD to <user>;
 -- grant create mining model to <user>;
-DECLARE
-    model_source BLOB := NULL;
-BEGIN
-    model_source := DBMS_CLOUD.get_object(
-      object_uri      => 'https://objectstorage.ap-seoul-1.oraclecloud.com/n/sehubjapacprod/b/HysunPubBucket/o/bge-base-zh-v1.5.onnx'
-    );
+-- grant create any directory to <user>;
 
+-- 先将模型文件 bge-base-zh-v1.5.onnx 上传到/u01/hysun/models目录
+-- 创建数据库目录指向模型文件所在目录
+create or replace directory MODELS_DIR as '/u01/hysun/models';
+
+-- 导入模型
+-- 实验做完后，删除模型以释放资源： 
+-- EXEC DBMS_VECTOR.DROP_ONNX_MODEL(model_name => 'mydoc_model', force => true);
+BEGIN
     DBMS_VECTOR.LOAD_ONNX_MODEL(
-      model_name      => 'mydoc_model',
-      model_data      => model_source,
-      metadata        => JSON('{"function" : "embedding", "embeddingOutput" : "embedding"}')
+        directory => 'MODELS_DIR',
+        file_name => 'bge-base-zh-v1.5.onnx',
+        model_name => 'mydoc_model'
     );
 END;
 /
+
 ```
 
 模型导入后，可以查看模型的属性：
@@ -317,17 +378,17 @@ WHERE MODEL_NAME = 'MYDOC_MODEL';
 可以测试一下导入的模型是否如期工作：
 
 ```sql
-SELECT VECTOR_EMBEDDING(mydoc_model USING 'Hello, World' as input) AS embedding;
+SELECT VECTOR_EMBEDDING(mydoc_model USING 'Hello, World' as data) AS embedding;
 ```
 
 ### 库内向量化及检索
 
 #### 准备数据
 
-为了排除干扰，我们新建同样的一张表 lab_vecstore2（为避免多人实验冲突，建议表名中加入自己的名字）：
+为了排除干扰，我们新建同样的一张表 lab_vecstore2：
 
 ```sql
-CREATE TABLE lab_vecstore_hysun2 ( --（请注意用自己的表名）
+CREATE TABLE lab_vecstore2 (
     id VARCHAR2(50) DEFAULT SYS_GUID() PRIMARY KEY,
     dataset_name VARCHAR2(50) NOT NULL,
     document CLOB,
@@ -336,12 +397,12 @@ CREATE TABLE lab_vecstore_hysun2 ( --（请注意用自己的表名）
 );
 ```
 
-然后从原来的表中拷贝几条数据（注意不要拷贝太多数据，以免多人操作造成资源紧张）：
+然后从原来的表中拷贝几条数据（作为实验，建议不要拷贝太多数据，以避免造成资源紧张）：
 
 ```sql
-insert into lab_vecstore_hysun2(dataset_name, document, cmetadata)
+insert into lab_vecstore2(dataset_name, document, cmetadata)
 select dataset_name, document, cmetadata 
-from lab_vecstore_hysun  --（请注意用自己的表名）
+from lab_vecstore  --
 where json_value(cmetadata, '$.source') like '%202408_23ai%';
 commit;
 ```
@@ -349,8 +410,15 @@ commit;
 #### 库内向量化
 
 ```sql
-update lab_vecstore_hysun2 set embedding=VECTOR_EMBEDDING(mydoc_model USING document as input);
+-- 向量化之前，先查看一下表中的数据，此时 EMBEDDING 字段是空
+select * from lab_vecstore2;
+
+-- 执行SQL完成向量化
+update lab_vecstore2 set embedding=VECTOR_EMBEDDING(mydoc_model USING document as data);
 commit;
+
+-- 向量化之后，再次查看一下表中的数据，此时 EMBEDDING 字段是已经有值了。
+select * from lab_vecstore2;
 ```
 
 上述操作我们直接用标准的 SQL update 语句对表中的源数据进行了向量化。
@@ -362,9 +430,9 @@ commit;
 ```sql
 select document,
   json_value(cmetadata, '$.source') as src_file
-from lab_vecstore_hysun2
+from lab_vecstore2
 where dataset_name='oracledb_docs'
-order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 23ai 新特性' as input), COSINE)
+order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 23ai 新特性' as data), COSINE)
 FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
@@ -409,7 +477,7 @@ pip install vllm
 #### 测试部署是否成功：
 
 ```shell
-curl http://150.230.37.250:8098/v1/chat/completions \
+curl http://146.235.226.110:8098/v1/chat/completions \
     -H "Content-Type: application/json" \
     -d '{
         "model": "Qwen2-7B-Instruct",
@@ -433,15 +501,20 @@ curl -fsSL https://ollama.com/install.sh | sh
 启动运行：
 
 ```shell
+-- 设置 ollama 监听地址和端口。如果 ollama 是以系统服务启动，则也需要将环境变量增加到系统服务中。
 export OLLAMA_HOST=0.0.0.0:8098
 
+-- 手工启动ollama进程
+ollama serve
+
+-- 运行模型
 ollama run qwen2:7b-instruct
 ```
 
 #### 测试部署是否成功：
 
 ```shell
-curl http://150.230.37.250:8098/v1/chat/completions \
+curl http://146.235.226.110:8098/v1/chat/completions \
     -H "Content-Type: application/json" \
     -d '{
         "model": "qwen2:7b-instruct",
@@ -487,7 +560,7 @@ begin
   
     -- 第二步：调用大语言模型，生成RAG结果
     l_clob := apex_web_service.make_rest_request(
-        p_url => 'http://150.230.37.250:8098/v1/chat/completions',
+        p_url => 'http://146.235.226.110:8098/v1/chat/completions',
         p_http_method => 'POST',
         p_body => l_input
     );
@@ -501,7 +574,7 @@ end;
 
 运行结果：
 
-![1725247018140](image/lab_guide/1725247018140.png)
+![chat_with_llm_directly](image/chat_with_llm_directly.png)
 
 ### RAG方式与LLM对话
 
@@ -539,7 +612,7 @@ begin
   
     -- 第二步：从向量数据库中检索出与问题相似的内容
     for rec in (select document, json_value(cmetadata, '$.source') as src_file
-        from lab_vecstore_hysun
+        from lab_vecstore
         where dataset_name='oracledb_docs'
         order by VECTOR_DISTANCE(embedding, to_vector(l_embedding))
         FETCH APPROX FIRST 3 ROWS ONLY) loop
@@ -571,14 +644,17 @@ end;
 
 运行结果：
 
-![1725246880358](image/lab_guide/1725246880358.png)
+![chat_with_rag](image/chat_with_rag.png)
+
 
 ## Oracle 库内向量化流水线操作（可选）
+
+Oracle数据库提供一系列工具，让用户可以用极简单的方式将源数据向量化并加载到数据库中。
 
 本节主要目的在于：了解在Oracle库内实现一个完整的从源文件到生成向量数据 这样一个库内流水线操作：PDF文件 --> 文件文件 --> 文件分块 --> 生成向量数据。
 
 
-![1725959039839](image/Oracle向量数据库_lab/1725959039839.png)
+![vectorize_pipeline](image/vectorize_pipeline.png)
 
 Oracle 数据库提供了一系列的工具方法，以方便向量的操作。这些方法主要封装在 DBMS_VECTOR / DBMS_VECTOR_CHAIN 这两个包中，可以直接调用。例如：
 

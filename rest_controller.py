@@ -10,21 +10,17 @@ import os
 import json
 import oracledb
 import load_utils
+import markdown
 from oracledb import Connection
 from langchain_huggingface import HuggingFaceEmbeddings
 from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from langchain.docstore.document import Document
 from MyTOs import Response, QueryPara
 
 from dotenv import load_dotenv
 load_dotenv("app.env")
-
-# 数据库连接信息
-username = os.environ.get("DB_USER")
-password = os.environ.get("DB_PWD")
-dsn = os.environ.get("DB_DSN")
-# print(f"{username} - {password} - {dsn}")
 
 # 加载 Embeddings 模型
 embedding_model = HuggingFaceEmbeddings(
@@ -95,7 +91,9 @@ def insert_one_document(client: Connection, table_name: str, dataset_name: str, 
 
 @_app.post(f"{os.environ.get("CONTEXT_ROOT")}/prepare-data")
 def prepare_data(
-    table_name: str = Body(examples=["lab_vecstore_<your_name>", "lab_vecstore_david"]),
+    db_user: str = Body(description="Database user"),
+    db_password: str = Body(description="Database schema password"),
+    table_name: str = Body(examples=["lab_vecstore"]),
     dataset_name: str = Body(examples=["oracledb_docs", "mylab_test_data"]),
 ) -> Response:
     print(f"# Got prepare_data request: {table_name} - {dataset_name}")
@@ -107,7 +105,7 @@ def prepare_data(
     # 数据入库
     print("# Inserting data to the vector store...")
     row_inserted = 0
-    with oracledb.connect(user=username, password=password, dsn=dsn) as connection:
+    with oracledb.connect(user=db_user, password=db_password, dsn=os.environ.get("DB_DSN")) as connection:
         for docu in documents:
             c = insert_one_document(client=connection, table_name=table_name, dataset_name=dataset_name,doc=docu)
             row_inserted = row_inserted + c
@@ -131,3 +129,20 @@ def embedding_query(
     
     return resp
 
+
+@_app.get(f"{os.environ.get("CONTEXT_ROOT")}/lab")
+def lab():
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), "."))
+    with open(f"{path}/Oracle向量数据库_lab.md", "r") as file:
+        md_str = file.read()
+    html_str = markdown.markdown(md_str)
+    return HTMLResponse(content=html_str, status_code=200)
+
+
+@_app.get(f"{os.environ.get("CONTEXT_ROOT")}/readme")
+def readme():
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), "."))
+    with open(f"{path}/README.md", "r") as file:
+        md_str = file.read()
+    html_str = markdown.markdown(md_str)
+    return HTMLResponse(content=html_str, status_code=200)
