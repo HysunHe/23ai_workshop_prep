@@ -1,0 +1,361 @@
+## Oracle向量数据库与RAG应用
+
+本节将实验向量数据库的一个典型应用场景：RAG。在RAG的解决方案中，组件要素主要包括：大语言模型（LLM）、向量嵌入模型（embedding model）、向量数据库 以及 Rerank模型（非必要，根据实际情况可选，本实验不涉及Rerank模型）。
+
+本实验中我们通过对比 直接与大模型（LLM）对话 和 使用RAG的方式与LLM对话 两者生成结果的区别来直观的了解向量数据库在这种场景中的作用。
+
+### 大语言模型部署（仅讲师操作）
+
+大语言模型是生成式AI的关键部分。本实验中，我们将选用开源的通义千问模型：Qwen2-7B-Instruct
+
+考虑到硬件资源因素，本操作仅由讲师完成。
+
+#### 下载模型
+
+从魔搭社区 (modelscope) 下载：[Qwen2-7B-Instruct](https://www.modelscope.cn/models/qwen/Qwen2-7B-Instruct)
+
+#### 用vLLM部署模型（GPU）
+
+在GPU机器上可以采用vLLM来部署模型。vLLM是一个模型加速库，能大幅提升推理效率及并发。
+
+安装Python环境及vLLM工具：
+
+```shell
+conda create -n vllm python=3.12
+
+conda activate vllm
+
+pip install vllm
+```
+
+启动运行：
+
+```shell
+ python -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048
+```
+
+#### 测试部署是否成功：
+
+```shell
+curl http://146.235.226.110:8098/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me something about large language models."}
+        ]
+    }'
+```
+
+#### 用Ollama部署模型
+
+开发测试也可以采用Ollama来部署模型，可以在CPU机器上运行模型。
+
+安装 ollama：
+
+```shell
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+启动运行：
+
+```shell
+
+-- 手工启动ollama进程。这里指定了ollama服务的监听地址。如果 ollama 是以系统服务启动，则也需要将环境变量增加到系统服务中。
+OLLAMA_HOST=0.0.0.0:8098 ollama serve
+
+-- 运行模型
+OLLAMA_HOST=127.0.0.1:8098 ollama run qwen2:7b-instruct
+```
+
+![ollama_setup](image/ollama_setup.png)
+
+#### 测试部署是否成功：
+
+```shell
+curl http://146.235.226.110:8098/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "qwen2:7b-instruct",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Tell me something about large language models."}
+        ]
+    }'
+```
+
+### 直接与LLM对话（非RAG)
+
+先运行如下语句，打开输出信息，这样dbms_output就能在脚本输出窗口中输出打印信息了。
+
+```sql
+SET SERVEROUTPUT ON;
+```
+
+以下PL/SQL代码是直接调用LLM API的过程，也可以用其它语言实现，步骤或逻辑都一样。
+
+```sql
+declare
+    l_question varchar2(500) := 'Oracle 23ai 新特性';
+    l_input CLOB;
+    l_clob  CLOB;
+    j apex_json.t_values;
+    l_embedding CLOB;
+    l_context   CLOB;
+    l_rag_result CLOB;
+begin
+    apex_web_service.g_request_headers(1).name :=  'Content-Type';
+    apex_web_service.g_request_headers(1).value := 'application/json';
+    l_input := '{"text": "' || l_question || '"}';
+  
+    -- 第一步：提示工程：给大语言模型明确的指示
+    l_input := '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请回答用户提出的问题。"},
+            {"role": "user", "content": "' || l_question || '"}
+        ]
+    }';
+  
+    -- 第二步：调用大语言模型，生成RAG结果
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8098/v1/chat/completions',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob); 
+    l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
+  
+    dbms_output.put_line('*** Result: ' || chr(10) || l_rag_result);
+end;
+/
+```
+
+运行结果：
+
+![chat_with_llm_directly](image/chat_with_llm_directly.png)
+
+### RAG方式与LLM对话
+
+先运行如下语句，打开输出信息，这样dbms_output就能在脚本输出窗口中输出打印信息了。
+
+```sql
+SET SERVEROUTPUT ON;
+```
+
+以下PL/SQL代码是执行 RAG 的过程，也可以用其它语言实现，步骤或逻辑都一样。
+
+```sql
+declare
+    l_question varchar2(500) := 'Oracle 23ai 新特性';
+    l_input CLOB;
+    l_clob  CLOB;
+    j apex_json.t_values;
+    l_embedding CLOB;
+    l_context   CLOB;
+    l_rag_result CLOB;
+begin
+    apex_web_service.g_request_headers(1).name :=  'Content-Type';
+    apex_web_service.g_request_headers(1).value := 'application/json';
+    l_input := '{"text": "' || l_question || '"}';
+  
+    -- 第一步：向量化用户问题
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8099/workshop/embedding',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob);   
+    l_embedding := apex_json.get_varchar2(p_path => 'data.embedding', p_values => j);
+    -- dbms_output.put_line('*** embedding: ' || l_embedding);
+  
+    -- 第二步：从向量数据库中检索出与问题相似的内容
+    for rec in (select document, json_value(cmetadata, '$.source') as src_file
+        from lab_vecstore
+        where dataset_name='oracledb_docs'
+        order by VECTOR_DISTANCE(embedding, to_vector(l_embedding))
+        FETCH APPROX FIRST 3 ROWS ONLY) loop
+        l_context := l_context || rec.document || chr(10);
+    end loop;
+  
+    -- 第三步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
+    l_input := '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请仅仅根据提供的上下文内容，回答用户的问题，且不要试图编造答案。\n 以下是上下文内容：' || replace(l_context, chr(10), '\n') || '"},
+            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答）"}
+        ]
+    }';
+  
+    -- 第四步：调用大语言模型，生成RAG结果
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8098/v1/chat/completions',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob); 
+    l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
+  
+    dbms_output.put_line('*** RAG Result: ' || chr(10) || l_rag_result);
+end;
+/
+```
+
+运行结果：
+
+![chat_with_rag](image/chat_with_rag.png)
+
+### Oracle 库内向量化流水线操作
+
+Oracle数据库提供一系列工具，让用户可以用极简单的方式将源数据向量化并加载到数据库中。
+
+本节主要目的在于：了解在Oracle库内实现一个完整的从源文件到生成向量数据 这样一个库内流水线操作：PDF文件 --> 文件文件 --> 文件分块 --> 生成向量数据。
+
+![vectorize_pipeline](image/vectorize_pipeline.png)
+
+Oracle 数据库提供了一系列的工具方法，以方便向量的操作。这些方法主要封装在 DBMS_VECTOR / DBMS_VECTOR_CHAIN 这两个包中，可以直接调用。例如：
+
+* dbms_vector_chain.utl_to_text：将文件转换为文本格式，如PDF格式转换为文本格式。
+* dbms_vector_chain.utl_to_chunks: 将文档以块的形式拆分成多个块
+* dbms_vector_chain.utl_to_embeddings：将文档块进行向量化（批量形式）。
+* dbms_vector_chain.utl_to_generate_text：调用大语言模型，生成RAG结果。
+
+对于【PDF文件 --> 文件文件 --> 文件分块 --> 向量化】这样一个复杂的过程，利用上面这些工具方法，在Oracle数据库中仅通过一条SQL语句即可实现。下面我们展示一下这个过程：
+
+#### 先准备数据表
+
+```sql
+-- 用来加载存储源文件
+create table RAG_FILES (
+    file_name varchar2(500), 
+    file_content BLOB
+);
+
+-- 用来存储文件块以及对象的向量
+CREATE TABLE RAG_DOC_CHUNKS (	
+    "DOC_ID" VARCHAR2(500), 
+	"CHUNK_ID" NUMBER, 
+	"CHUNK_DATA" VARCHAR2(4000), 
+	"CHUNK_EMBEDDING" VECTOR
+);
+
+
+```
+
+#### 加载文件
+
+加载文件有多种方式，比如从对象存储中加载、从文件服务器加载等等。为简单起见，本实验中预先将一个PDF文件上传到数据库服务器上，从本地目录加载文件。
+
+```sql
+-- 首先，将文件手工上传至 /u01/hysun/rag_docs 目录
+
+-- 然后再创建数据库目录，如下
+create or replace directory RAG_DOC_DIR as '/u01/hysun/rag_docs';
+
+-- 从数据目录下加载源文件入库
+insert into RAG_FILES(file_name, file_content) values('oracle-vector-lab', to_blob(bfilename('RAG_DOC_DIR', 'Oracle向量数据库_lab.pdf')));
+commit;
+
+```
+
+![pipeline_loadfile](image/pipeline_loadfile.png)
+
+
+#### 执行 文件转换-->文档拆分-->向量化
+
+以下用一条SQL完成了【PDF格式 -> 文本格式 -> 文档分块 -> 向量化】这样一个比较复杂的流程：
+
+```sql
+insert into rag_doc_chunks
+select 
+    dt.file_name doc_id, 
+    et.embed_id chunk_id, 
+    et.embed_data chunk_data, 
+    to_vector(et.embed_vector) chunk_embedding
+from
+    rag_files dt,
+    dbms_vector_chain.utl_to_embeddings(
+        dbms_vector_chain.utl_to_chunks(
+            dbms_vector_chain.utl_to_text(dt.file_content),
+            json('{"normalize":"all"}')
+        ),
+        json('{"provider":"database", "model":"mydoc_model"}')
+    ) t,
+    JSON_TABLE(
+        t.column_value, 
+        '$[*]' COLUMNS (
+            embed_id NUMBER PATH '$.embed_id', 
+            embed_data VARCHAR2(4000) PATH '$.embed_data', 
+            embed_vector CLOB PATH '$.embed_vector'
+        )
+    ) et;
+commit;
+```
+
+![pipeline_embedding](image/pipeline_embedding.png)
+
+#### 向量相似度检索
+
+源数据完成向量化后，就可以利用 VECTOR_DISTANCE 进行向量相似度检索了。
+
+```sql
+select *
+from rag_doc_chunks
+order by VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING '本次实验的先决条件' as data), COSINE)
+FETCH FIRST 1 ROWS ONLY;
+```
+
+![pipeline_query](image/pipeline_query.png)
+
+
+#### 结合向量相似度检索做RAG
+
+```sql
+set serveroutput on;
+
+declare
+    l_question varchar2(500) := '本次实验的先决条件';
+    l_input CLOB;
+    l_clob  CLOB;
+    j apex_json.t_values;
+    l_context   CLOB;
+    l_rag_result CLOB;
+begin
+    -- 第一步：从向量数据库中检索出与问题相似的内容
+    for rec in (
+        select
+        chunk_data
+        from rag_doc_chunks
+        order by VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING l_question as data), COSINE)
+        FETCH FIRST 1 ROWS ONLY
+    ) loop
+        l_context := l_context || rec.chunk_data || chr(10);
+    end loop;
+
+    -- 第二步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
+    l_context := replace(replace(replace(l_context, '''', ''), '"', '\"'), chr(10), '\n');
+
+    l_input := '{
+        "model": "Qwen2-7B-Instruct",
+        "messages": [
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请仅仅根据提供的上下文内容，回答用户的问题，且不要试图编造答案。\n 以下是上下文内容：' || replace(l_context, chr(10), '\n') || '"},
+            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答）"}
+        ]
+    }';
+  
+    -- 第三步：调用大语言模型，生成RAG结果
+    l_clob := apex_web_service.make_rest_request(
+        p_url => 'http://146.235.226.110:8098/v1/chat/completions',
+        p_http_method => 'POST',
+        p_body => l_input
+    );
+    apex_json.parse(j, l_clob); 
+    l_rag_result := apex_json.get_varchar2(p_path => 'choices[%d].message.content', p0 => 1, p_values => j);
+
+    dbms_output.put_line('*** RAG Result: ' || chr(10) || l_rag_result);
+end;
+/
+```
+
+![pipeline_rag](image/pipeline_rag.png)
