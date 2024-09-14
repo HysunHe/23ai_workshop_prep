@@ -1,26 +1,64 @@
 # Oracle向量数据库动手实验
 
-本实验以熟悉Oracle向量数据库的一些实际操作为主要目的，主要内容包括 Oracle向量数据类型、向量模型、数据向量化（库外向量化与库内向量化两种方式）、向量索引（HNSW和IVF）、向量检索（非索引精确检索和索引近似检索）、RAG。
+- [Oracle向量数据库动手实验](#Oracle向量数据库动手实验)
+  - [介绍](#介绍)
+  - [前提条件](#前提条件)
+  - [环境准备](#环境准备)
+  - [实验1：Oracle向量基本操作](#实验1：Oracle向量基本操作)
+  - [实验2：向量检索](#实验2：向量检索)
+    - [任务1：向量精确检索](#任务1：向量精确检索)
+    - [任务2：向量近似检索](#任务2：向量近似检索)
+  - [实验3：向量嵌入模型部署（仅讲师操作）](#实验3：部署向量嵌入模型（仅讲师操作）)
+  - [实验4：库外向量化操作](#实验4：库外向量化操作)
+  - [实验5：库内向量化操作](#实验5：库内向量化操作)
+    - [任务1：导入向量嵌入模型](#任务1：导入向量嵌入模型)
+    - [任务2：库内向量化及检索](#任务2：库内向量化及检索)
+  - [总结](#总结)
+
+## 介绍
+
+本实验以熟悉Oracle向量数据库的一些实际操作为主要目的，主要内容包括 Oracle向量数据类型、向量模型、数据向量化（库外向量化与库内向量化两种方式）、向量索引（HNSW和IVF）、向量检索（非索引精确检索和索引近似检索）。
+
+预计时间：**1.5小时**
+
+**目标**
+
+- 了解Oracle向量数据类型及基本操作
+- 了解向量相似度检索，包括精确检索和近似检索
+- 了解常用的向量索引类型
+- 了解向量模型的部署以及Oracle数据库与外部向量模型的结合
+- 了解向量模型的导入以及Oracle数据库的库内向量化操作
+- 了解库外向量化及库内向量化的优劣现状及前景
 
 ## 前提条件
 
-1. 本实验重点在于动手操作，非对向量数据库及Oracle向量数据库进行理论上的讲解，因此，需要参与者对向量数据库及Oracle向量数据库有一个基本的概念上的了解。
+1. 本实验重点在于动手操作，非对向量数据库及Oracle向量数据库进行理论上的讲解，因此，需要参与者已经参加过Oracle向量数据库的介绍或有所了解。
 2. 有基本的PL/SQL知识，能够看简单的PL/SQL示例代码，能够利用客户端（如sqlplus）等运行提供的PL/SQL示例代码。
-3. 有基本的Python知识，能够看懂简单的Python示例代码。
+3. 最好有基本的Python知识，能够看懂简单的Python示例代码（非必需）。
 
 ## 环境准备
 
+### 工具
+
 1. Oracle 23ai 数据库
 2. SQL Developer 23.1.1
-3. API 调用工具，比如 curl。
+3. API 调用工具如curl。
 
-## 任务一：连上远程环境，打开SQL Developer，连接数据库，执行基本的向量操作
+### 数据库连接
 
-用分配的用户名和密码，连接上远程环境，打开桌面版SQL Developer界面，用分配给自己的数据库用户名和密码创建数据库连接，连接上数据库。
+每位参与者都会分配一个独立的数据库用户名和密码，在实验操作中请使用自己的数据库用户。
+
+数据库IP：10.113.121.221
+数据库端口：1521
+数据库服务名：ai23pdb.cn.osc.oracle.com
+
+SQL Developer连接信息如：
 
 ![sql_developer](image/sql_developer.png)
 
-然后执行并熟悉如下一些基本的向量操作：
+## 实验1：Oracle向量基本操作
+
+让我们从基本的向量操作开如：
 
 ### 字符串转换为向量
 
@@ -59,8 +97,6 @@ SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,5]'), COSINE) as distance;
 
 注：余弦距离策略关注的是两个向量在方向上的一致性，上述 [2,2] 和 [5,5] 在方向上完全一致，因此，它们的距离为0，代表两个向量完全匹配。
 
-## Oracle向量数据库基本操作
-
 ### 向量类型字段及样例表
 
 Oracle 23ai 引入了向量数据类型：VECTOR (dimentions, format)，该类型可指定两个参数，第一个是向量的维度，如 [2,2] 是一个二维向量；第二个是数据格式，如 FLOAT32。也可以不指定。
@@ -76,7 +112,9 @@ create table galaxies (
 );
 ```
 
-### Insert sample data
+### 样例数据
+
+向 galaxies 表中插入如下样例数据：
 
 ```sql
 insert into galaxies values (1, 'M31', 'Messier 31 is a barred spiral galaxy in the Andromeda constellation.', '[0,1,1,0,0]');
@@ -91,9 +129,13 @@ insert into galaxies values (9, 'NGC1073', 'NGC 1073 is a barred spiral galaxy i
 commit;
 ```
 
-### 向量精确检索（Exact Search）
+数据准备好后，接下来，我们就可以根所数据进行检索了。
 
-向量精确检索类似于关系数据查询时的全表扫描，是指库中的每一个向量都与查询向量进行匹配，这样就能计算出每个向量与查询向量之间的相似度，从而精确的返回与查询向量最相似的 N 条记录，不会漏掉任何一条记录（也就是说，召回率始终能达到 100%）.
+## 实验2：向量检索
+
+### 任务1：向量精确检索
+
+向量精确检索（Exact Search）类似于关系数据查询时的全表扫描，是指库中的每一个向量都与查询向量进行匹配，这样就能计算出每个向量与查询向量之间的相似度，从而精确的返回与查询向量最相似的 N 条记录，不会漏掉任何一条记录（也就是说，召回率始终能达到 100%）.
 
 由于结果的准确性，毫无疑问，在需要遍历的向量数据集较小时，精确检索是较优的方式。
 
@@ -116,13 +158,15 @@ FETCH FIRST 3 ROWS ONLY;
 
 ![galaxies_exact_search_exec_plan](image/galaxies_exact_search_exec_plan.png)
 
-### 向量近似检索（Approximate Search）
+### 任务2：向量近似检索
+
+向量近似检索（Approximate Search）
 
 精确检索获得了最高的准确率，但需要遍历所有向量数据集，因此，在向量数据集比较大时，性能很可能会成为问题。向量检索中，准确率和性能之间，往往需要寻找一个平衡。在大数据集上，为了提高性能，利用索引进行向量近似检索是常用的方式。
 
 常见的向量索引有HNSW和IVF两种。
 
-### 创建HNSW索引
+#### 创建HNSW索引
 
 创建IV索引语句：
 
@@ -136,10 +180,10 @@ WITH TARGET ACCURACY 90;
 ```
 
 创建 HNSW 索引时，我们可以指定目标准确率 target accuracy，并行执行；还可以指定 HNSW 的参数 M (即 neighbors) 和 efConstruction (如上面注释掉的 Parameters 一行)。关于 HNSW 相关参数的说明可以参考如下文档：
-https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页)
+https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页) 
 https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswparameters?view=azure-node-latest
 
-### HNSW 近似检索
+#### HNSW 近似检索
 
 查询SQL:
 
@@ -158,7 +202,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![galaxies_approx_search_exec_plan](image/galaxies_approx_search_exec_plan.png)
 
-### 创建IVF索引
+#### 创建IVF索引
 
 如果之前已经在对应的列上创建了向量索引，那么先将其删除，如：
 
@@ -180,7 +224,7 @@ WITH TARGET ACCURACY 90;
 创建 IVF 索引时，我们可以指定目标准确率 target accuracy、并行执行参数，还可以指定 partition 数量等参数。关于 IVF 参数的说明，可以参考如下文档：
 https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (196页)
 
-### IVF 近似检索
+#### IVF 近似检索
 
 创建了IVF索引之后，我们利用索引进行近似检索（注：由于我们的实验用的数据集很小，所以优化器很可能不会选择走IVF索引）
 
@@ -199,7 +243,9 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![galaxies_ivf_search_exec_plan](image/galaxies_ivf_search_exec_plan.png)
 
-## 部署向量嵌入模型（仅讲师操作）
+## 实验3：部署向量嵌入模型（仅讲师操作）
+
+**此节内容仅讲师动手操作及讲解。**
 
 以上我们介绍了向量的基本操作。在上面的例子中，我们的向量数据是手工造的，向量的维度也很小。那么，在现实环境中，向量数据是如何来的？答案是向量嵌入模型。
 
@@ -239,7 +285,9 @@ FETCH APPROX FIRST 3 ROWS ONLY;
     }'
    ```
 
-## 库外向量化操作
+## 实验4：库外向量化操作
+
+### 数据加载
 
 库外向量化指源数据由外部程序向量化之后，再插入或加载到数据库表中。在本例中，我们将使用 Python 程序将文本数据向量化之后，再调用Oracle客户包将数据插入到数据库中。这是常用的一种方法，操作方式也与平时的数据加载操作一致。
 
@@ -350,11 +398,11 @@ end;
 
 ![query_with_dataset](image/query_with_dataset.png)
 
-## 库内向量化操作
+## 实验5：库内向量化操作
 
 Oracle 数据库提供了库内向量化的特性，其允许用户导入向量嵌入模型到数据库中，然后可以直接在SQL中对数据进行向量化操作，无需依赖外部的程序，这种方式很大程序的简化了向量数据的加载和检索，非常方便。
 
-### 导入向量嵌入模型
+### 任务1：导入向量嵌入模型
 
 考虑到硬件资源因素，没有足够的资源让每个人都加载一份模型，因此，本操作仅由讲师完成。讲师展示加载操作，并提供讲解。
 
@@ -405,7 +453,7 @@ SELECT VECTOR_EMBEDDING(mydoc_model USING 'Hello, World' as data) AS embedding;
 
 ![test_embedding_onnx](image/test_embedding_onnx.png)
 
-### 库内向量化及检索
+### 任务2：库内向量化及检索
 
 #### 准备数据
 
@@ -470,4 +518,12 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![query_with_onnx](image/query_with_onnx.png)
 
-至此，我们已经完成了Oracle向量数据库的库内向量化操作。
+## 总结
+
+至此，我们已经完成了Oracle向量数据库的动手实验第一部分。
+
+从本节内容中，我们实现了利用向量检索的精确检索和近似检索两种方式。现实中，在相对较大的数据库中，精确检索往往只有在融合数据库中才能发挥出真正的优势。比如，在我们的实验中，我们使用标量字段dataset_name='oracledb_docs'将需要进行向量检索的数据集大幅度缩小了，有效弥补了精确检索的性能问题。
+
+同时，我们还实现了Oracle库外向量化和库内向量化两种方式。库内向量化因其简单便捷的特点，有可能成为未来向量化的一个重要方向。然而，就目前而言，局限于数据库硬件资源现状，往往库外向量化方式使用更多。
+
+下一节我们将进行第二部分的实验：结合Oracle向量检索的RAG应用。
