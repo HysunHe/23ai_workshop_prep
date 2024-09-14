@@ -48,43 +48,6 @@ curl http://146.235.226.110:8098/v1/chat/completions \
     }'
 ```
 
-#### 用Ollama部署模型
-
-开发测试也可以采用Ollama来部署模型，可以在CPU机器上运行模型。
-
-安装 ollama：
-
-```shell
-curl -fsSL https://ollama.com/install.sh | sh
-```
-
-启动运行：
-
-```shell
-
--- 手工启动ollama进程。这里指定了ollama服务的监听地址。如果 ollama 是以系统服务启动，则也需要将环境变量增加到系统服务中。
-OLLAMA_HOST=0.0.0.0:8098 ollama serve
-
--- 运行模型
-OLLAMA_HOST=127.0.0.1:8098 ollama run qwen2:7b-instruct
-```
-
-![ollama_setup](image/ollama_setup.png)
-
-#### 测试部署是否成功：
-
-```shell
-curl http://146.235.226.110:8098/v1/chat/completions \
-    -H "Content-Type: application/json" \
-    -d '{
-        "model": "qwen2:7b-instruct",
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Tell me something about large language models."}
-        ]
-    }'
-```
-
 ### 直接与LLM对话（非RAG)
 
 先运行如下语句，打开输出信息，这样dbms_output就能在脚本输出窗口中输出打印信息了。
@@ -175,7 +138,7 @@ begin
         from lab_vecstore
         where dataset_name='oracledb_docs'
         order by VECTOR_DISTANCE(embedding, to_vector(l_embedding))
-        FETCH APPROX FIRST 3 ROWS ONLY) loop
+        FETCH FIRST 3 ROWS ONLY) loop
         l_context := l_context || rec.document || chr(10);
     end loop;
   
@@ -249,6 +212,7 @@ CREATE TABLE RAG_DOC_CHUNKS (
 
 ```sql
 -- 首先，将文件手工上传至 /u01/hysun/rag_docs 目录
+-- 本实验中已经预先上传了一个PDF文件（内容就是本实验的PDF指导文件)
 
 -- 然后再创建数据库目录，如下
 create or replace directory RAG_DOC_DIR as '/u01/hysun/rag_docs';
@@ -303,7 +267,7 @@ commit;
 select *
 from rag_doc_chunks
 order by VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING '本次实验的先决条件' as data), COSINE)
-FETCH FIRST 1 ROWS ONLY;
+FETCH FIRST 3 ROWS ONLY;
 ```
 
 ![pipeline_query](image/pipeline_query.png)
@@ -315,7 +279,7 @@ FETCH FIRST 1 ROWS ONLY;
 set serveroutput on;
 
 declare
-    l_question varchar2(500) := '本次实验的先决条件';
+    l_question varchar2(500) := '完成本次实验的前提条件需要哪些';
     l_input CLOB;
     l_clob  CLOB;
     j apex_json.t_values;
@@ -328,7 +292,7 @@ begin
         chunk_data
         from rag_doc_chunks
         order by VECTOR_DISTANCE(chunk_embedding, VECTOR_EMBEDDING(mydoc_model USING l_question as data), COSINE)
-        FETCH FIRST 1 ROWS ONLY
+        FETCH FIRST 3 ROWS ONLY
     ) loop
         l_context := l_context || rec.chunk_data || chr(10);
     end loop;
