@@ -21,6 +21,9 @@
 
 ## 介绍
 
+为方便拷贝粘贴，使用过程中也可以借助本文档的Markdown版本： 
+https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93_lab2.md
+
 本实验是Oracle向量数据库动手实验的第二部分内容。
 
 本节将实验向量数据库的一个典型应用场景：RAG。在RAG的解决方案中，组件要素主要包括：大语言模型（LLM）、向量嵌入模型（embedding model）、向量数据库 以及 Rerank模型（非必要，根据实际情况可选，本实验不涉及Rerank模型）。

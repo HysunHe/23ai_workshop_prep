@@ -17,6 +17,9 @@
 
 ## 介绍
 
+为方便拷贝粘贴，使用过程中也可以借助本文档的Markdown版本：
+https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93_lab1.md
+
 本实验以熟悉Oracle向量数据库的一些实际操作为主要目的，主要内容包括 Oracle向量数据类型、向量模型、数据向量化（库外向量化与库内向量化两种方式）、向量索引（HNSW和IVF）、向量检索（非索引精确检索和索引近似检索）。
 
 预计时间：**1.5小时**
