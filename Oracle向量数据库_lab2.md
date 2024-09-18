@@ -190,11 +190,12 @@ begin
     end loop;
   
     -- 第三步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
+    l_context := replace(replace(replace(l_context, '''', ''), '"', '\"'), chr(10), '\n');
     l_input := '{
         "model": "Qwen2-7B-Instruct",
         "messages": [
-            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请仅仅根据提供的上下文内容，回答用户的问题，且不要试图编造答案。\n 以下是上下文内容：' || replace(l_context, chr(10), '\n') || '"},
-            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答）"}
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请根据提供的上下文内容，回答用户的问题。\n 以下是上下文内容：' || l_context || '"},
+            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答，不要试图编造答案）"}
         ]
     }';
   
@@ -352,12 +353,11 @@ begin
 
     -- 第二步：提示工程：将相似内容和用户问题一起，组成大语言模型的输入
     l_context := replace(replace(replace(l_context, '''', ''), '"', '\"'), chr(10), '\n');
-
     l_input := '{
         "model": "Qwen2-7B-Instruct",
         "messages": [
-            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请仅仅根据提供的上下文内容，回答用户的问题，且不要试图编造答案。\n 以下是上下文内容：' || replace(l_context, chr(10), '\n') || '"},
-            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答）"}
+            {"role": "system", "content": "你是一个诚实且专业的数据库知识问答助手，请根据提供的上下文内容，回答用户的问题。\n 以下是上下文内容：' || l_context || '"},
+            {"role": "user", "content": "' || l_question || '（请仅根据提供的上下文内容回答，不要试图编造答案）"}
         ]
     }';
   
