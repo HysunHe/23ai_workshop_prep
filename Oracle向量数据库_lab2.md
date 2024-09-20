@@ -42,10 +42,16 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 
 参与者已经熟悉Oracle数据库向量检索的基本操作，最好是已经参加了Oracle向量数据库动手实验的第一部分内容。
 
+
 ## 环境准备
 
-1. Oracle 23ai 数据库
-2. SQL Developer 23.1.1
+请参考《动手试验环境说明.pdf》文档
+
+SQL Developer连接信息如：
+
+![sql_developer](image/sql_developer.png)
+
+
 
 ## 实验1：大语言模型部署（仅讲师操作）
 

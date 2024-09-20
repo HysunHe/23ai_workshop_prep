@@ -39,25 +39,15 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 2. 有基本的PL/SQL知识，能够看简单的PL/SQL示例代码，能够利用客户端（如sqlplus）等运行提供的PL/SQL示例代码。
 3. 最好有基本的Python知识，能够看懂简单的Python示例代码（非必需）。
 
+
 ## 环境准备
 
-### 工具
-
-1. Oracle 23ai 数据库
-2. SQL Developer 23.1.1
-3. API 调用工具如curl。
-
-### 数据库连接
-
-每位参与者都会分配一个独立的数据库用户名和密码，在实验操作中请使用自己的数据库用户。
-
-数据库IP：10.113.121.221
-数据库端口：1521
-数据库服务名：ai23pdb.cn.osc.oracle.com
+请参考《动手试验环境说明.pdf》文档
 
 SQL Developer连接信息如：
 
 ![sql_developer](image/sql_developer.png)
+
 
 ## 实验1：Oracle向量基本操作
 
