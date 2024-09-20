@@ -42,9 +42,9 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 
 ## 环境准备
 
-请参考《动手试验环境说明.pdf》文档
+本实验需要的环境，请参考《动手试验环境说明.pdf》中 “参与者”已分配的账号和密码。如user1/user1。
 
-SQL Developer连接信息如：
+例如，连接SQL Developer：
 
 ![sql_developer](image/sql_developer.png)
 
