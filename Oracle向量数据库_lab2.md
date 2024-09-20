@@ -14,14 +14,14 @@
   - [实验4：Oracle库内向量化流水线操作](#实验4：Oracle库内向量化流水线操作)
     - [准备数据表](#准备数据表)
     - [加载文件](#加载文件)
-    - [执行【文件转换-->文档拆分-->向量化】流水线](#执行【文件转换-->文档拆分-->向量化】流水线)
+    - [执行【文件转换--&gt;文档拆分--&gt;向量化】流水线](#执行【文件转换-->文档拆分-->向量化】流水线)
     - [向量相似度检索](#向量相似度检索)
     - [RAG](#结合向量相似度检索做RAG)
   - [总结](#总结)
 
 ## 介绍
 
-为方便拷贝粘贴，使用过程中也可以借助本文档的Markdown版本： 
+为方便拷贝粘贴，使用过程中也可以借助本文档的Markdown版本：
 https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93_lab2.md
 
 本实验是Oracle向量数据库动手实验的第二部分内容。
@@ -47,7 +47,6 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 1. Oracle 23ai 数据库
 2. SQL Developer 23.1.1
 
-
 ## 实验1：大语言模型部署（仅讲师操作）
 
 **此节内容仅讲师动手操作及讲解。**
@@ -55,6 +54,12 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 大语言模型是生成式AI的关键部分。本实验中，我们将选用开源的通义千问模型：Qwen2-7B-Instruct
 
 考虑到硬件资源因素，本操作仅由讲师完成。
+
+模型部署将部署到以下 GPU (A10) 机器上：
+
+机器IP: 146.235.226.110
+
+备用机器IP：150.230.37.250 (人数较多主机器服务不过来时使用)
 
 ### 下载模型
 
@@ -67,20 +72,23 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 安装Python环境及vLLM工具：
 
 ```shell
+# 创建Python环境
 conda create -n vllm python=3.12
 
+# 进入新创建的环境
 conda activate vllm
 
+# 安装vllm依赖包
 pip install vllm
 ```
 
 启动运行：
 
 ```shell
- python -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048
+ nohup python -u -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048 > vllm.out 2>&1 &
 ```
 
-### 测试部署：
+### 测试部署
 
 ```shell
 curl http://146.235.226.110:8098/v1/chat/completions \
@@ -144,7 +152,6 @@ end;
 运行结果：
 
 ![chat_with_llm_directly](image/chat_with_llm_directly.png)
-
 
 ## 实验3：RAG方式与LLM对话
 
@@ -217,11 +224,9 @@ end;
 
 ![chat_with_rag](image/chat_with_rag.png)
 
-
 ## 比较实验2和实验3的结果，理解导致差异的原因
 
 请观察和思考实验2和实验3的结果，理解导致二者结果差异的关键因素。
-
 
 ## 实验4：Oracle库内向量化流水线操作
 
@@ -250,7 +255,7 @@ create table RAG_FILES (
 );
 
 -- 用来存储文件块以及对象的向量
-CREATE TABLE RAG_DOC_CHUNKS (	
+CREATE TABLE RAG_DOC_CHUNKS (
     "DOC_ID" VARCHAR2(500), 
 	"CHUNK_ID" NUMBER, 
 	"CHUNK_DATA" VARCHAR2(4000), 
@@ -278,7 +283,6 @@ commit;
 ```
 
 ![pipeline_loadfile](image/pipeline_loadfile.png)
-
 
 ### 执行【文件转换-->文档拆分-->向量化】流水线
 
@@ -325,7 +329,6 @@ FETCH FIRST 3 ROWS ONLY;
 ```
 
 ![pipeline_query](image/pipeline_query.png)
-
 
 ### RAG
 
@@ -376,7 +379,6 @@ end;
 ```
 
 ![pipeline_rag](image/pipeline_rag.png)
-
 
 ## 总结
 

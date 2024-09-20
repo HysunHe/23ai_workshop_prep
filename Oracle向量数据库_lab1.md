@@ -6,13 +6,13 @@
   - [环境准备](#环境准备)
   - [实验1：Oracle向量基本操作](#实验1：Oracle向量基本操作)
   - [实验2：向量检索](#实验2：向量检索)
-    - [任务1：向量精确检索](#任务1：向量精确检索)
-    - [任务2：向量近似检索](#任务2：向量近似检索)
+    - [向量精确检索](#向量精确检索)
+    - [向量近似检索](#向量近似检索)
   - [实验3：向量嵌入模型部署（仅讲师操作）](#实验3：部署向量嵌入模型（仅讲师操作）)
   - [实验4：库外向量化操作](#实验4：库外向量化操作)
   - [实验5：库内向量化操作](#实验5：库内向量化操作)
-    - [任务1：导入向量嵌入模型](#任务1：导入向量嵌入模型)
-    - [任务2：库内向量化及检索](#任务2：库内向量化及检索)
+    - [导入向量嵌入模型](#导入向量嵌入模型)
+    - [库内向量化及检索](#库内向量化及检索)
   - [总结](#总结)
 
 ## 介绍
@@ -136,7 +136,7 @@ commit;
 
 ## 实验2：向量检索
 
-### 任务1：向量精确检索
+### 向量精确检索
 
 向量精确检索（Exact Search）类似于关系数据查询时的全表扫描，是指库中的每一个向量都与查询向量进行匹配，这样就能计算出每个向量与查询向量之间的相似度，从而精确的返回与查询向量最相似的 N 条记录，不会漏掉任何一条记录（也就是说，召回率始终能达到 100%）.
 
@@ -161,7 +161,7 @@ FETCH FIRST 3 ROWS ONLY;
 
 ![galaxies_exact_search_exec_plan](image/galaxies_exact_search_exec_plan.png)
 
-### 任务2：向量近似检索
+### 向量近似检索
 
 向量近似检索（Approximate Search）
 
@@ -183,7 +183,7 @@ WITH TARGET ACCURACY 90;
 ```
 
 创建 HNSW 索引时，我们可以指定目标准确率 target accuracy，并行执行；还可以指定 HNSW 的参数 M (即 neighbors) 和 efConstruction (如上面注释掉的 Parameters 一行)。关于 HNSW 相关参数的说明可以参考如下文档：
-https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页) 
+https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页)
 https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswparameters?view=azure-node-latest
 
 #### HNSW 近似检索
@@ -258,11 +258,32 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 考虑到硬件资源因素，没有足够的资源让每个人都部署一份模型，因此，本操作仅由讲师完成。讲师将向量嵌入模型部分为REST API 的方式，供大家调用；同时展示源代码并讲解。
 
+源代码：https://github.com/HysunHe/23ai_workshop_prep
+
+```shell
+# 创建Python环境
+conda create -n ws23ai python=3.12
+
+# 进入新创建的Python环境
+conda activate ws23ai
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 下载源码
+git clone https://github.com/HysunHe/23ai_workshop_prep
+
+# 启动模型
+cd 23ai_workshop_prep
+
+nohup python -u main.py > lab.out 2>&1 &
+```
+
 ### 向量嵌入模型访问
 
 向量嵌入模型部署完成后，就可以根据提供的REST API进行访问了。提供了如下两个API：
 
-1. 文本向量化API（后续用到）
+1. 文本向量化API（后续将用到）
 
    ```shell
     curl -X 'POST' \
@@ -273,7 +294,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
         "text": "<需要向量化的文本>"
     }'
    ```
-2. 批量数据准备API（后续用到）
+2. 批量数据准备API（后续将用到）
 
    ```shell
    curl -X 'POST' \
@@ -324,6 +345,13 @@ curl -X 'POST' \
         "dataset_name": "oracledb_docs"
     }'
 ```
+
+注：如果没安装curl等api调用工具，也可以通过如下界面的方式执行：
+    1. 打开链接 http://10.113.101.217:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
+    2. 点击 "Try it out" 按钮
+    3. 在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
+    4. 点击 "Execute" 按钮执行。
+    
 
 API 执行完成后，可以查看一下表中的数据：
 
@@ -405,7 +433,7 @@ end;
 
 Oracle 数据库提供了库内向量化的特性，其允许用户导入向量嵌入模型到数据库中，然后可以直接在SQL中对数据进行向量化操作，无需依赖外部的程序，这种方式很大程序的简化了向量数据的加载和检索，非常方便。
 
-### 任务1：导入向量嵌入模型
+### 导入向量嵌入模型
 
 考虑到硬件资源因素，没有足够的资源让每个人都加载一份模型，因此，本操作仅由讲师完成。讲师展示加载操作，并提供讲解。
 
@@ -456,7 +484,7 @@ SELECT VECTOR_EMBEDDING(mydoc_model USING 'Hello, World' as data) AS embedding;
 
 ![test_embedding_onnx](image/test_embedding_onnx.png)
 
-### 任务2：库内向量化及检索
+### 库内向量化及检索
 
 #### 准备数据
 
