@@ -13,7 +13,7 @@
   - [实验5：库内向量化操作](#实验5：库内向量化操作)
     - [导入向量嵌入模型](#导入向量嵌入模型)
     - [库内向量化及检索](#库内向量化及检索)
-  - [实验6：与第三方向量嵌入模型集成（演示）](#实验6：与第三方向量嵌入模型集成（演示）)
+  - [实验6：与第三方向量嵌入模型服务集成（演示）](#实验6：与第三方向量嵌入模型服务集成（演示）)
     - [开通第三方API服务](#开通第三方API服务)
     - [创建访问凭证](#创建访问凭证)
     - [直接在SQL中Embedding](#直接在SQL中Embedding)
@@ -581,7 +581,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![query_with_onnx](image/query_with_onnx.png)
 
-### 实验6：与第三方向量嵌入模型集成（演示）
+## 实验6：与第三方向量嵌入模型服务集成（演示）
 
 Oracle数据库向量化操作能支持众多外部提供商提供的API，包括：
 
@@ -595,11 +595,11 @@ Oracle数据库向量化操作能支持众多外部提供商提供的API，包�
 
 本节以腾讯混元Embeddings模型为例，演示如何在Oracle中直接用简单的SQL调用腾讯混元Embedding模型，实现数据的向量化。对于其它的API提供商，做法上是一样的。
 
-#### 开通第三方API服务
+### 开通第三方API服务
 
 首先，开通腾讯混元大模型服务，并注册API Key： https://console.cloud.tencent.com/hunyuan/api-key 。
 
-#### 创建访问凭证
+### 创建访问凭证
 
 利用刚才创建的API Key，在Oracle数据库中创建访问凭证。
 
@@ -619,7 +619,7 @@ end;
 ![create_credential](image/create_credential.png)
 
 
-#### 直接在SQL中Embedding
+### 直接在SQL中Embedding
 
 在SQL中直接调用dbms_vector.utl_to_embedding或dbms_vector.utl_to_embeddings将数据转化为向量：
 
