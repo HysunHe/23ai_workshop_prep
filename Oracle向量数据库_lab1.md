@@ -608,7 +608,7 @@ declare
   jo json_object_t;
 begin
   jo := json_object_t();
-  jo.put('access_token', 'sk-IGiJxMkA36gxNiCJ12oncx30BkGw6f7hpMm8cgsQx6aUHeAM');
+  jo.put('access_token', 'sk-IGiJxMkAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
   dbms_vector.create_credential(
     credential_name   => 'HYSUN_HUNYUAN_CRED',
     params            => json(jo.to_string));
@@ -617,7 +617,6 @@ end;
 ```
 
 ![create_credential](image/create_credential.png)
-
 
 ### 直接在SQL中Embedding
 
@@ -639,7 +638,6 @@ FROM dual;
 
 ![hunyuan_embedding](image/hunyuan_embedding.png)
 
-
 ## 总结
 
 至此，我们已经完成了Oracle向量数据库的动手实验第一部分。
@@ -647,5 +645,7 @@ FROM dual;
 本节内容中，我们实现了利用向量检索的精确检索和近似检索两种方式。现实中，在相对较大的数据集中，精确检索往往只有在融合数据库中才能发挥出真正的优势。比如，在我们的实验中，我们使用标量字段dataset_name='oracledb_docs'将需要进行向量检索的数据集大幅度缩小了，有效弥补了精确检索的性能问题。
 
 同时，我们还实现了Oracle库外向量化和库内向量化两种方式。库内向量化因其简单便捷的特点，有可能成为未来向量化的一个重要方向。然而，就目前而言，局限于数据库硬件资源现状，往往库外向量化方式使用更多。
+
+最后，我们还介绍了如何通过与第三方Embedding API服务集成，在SQL中调用第三方服务完成向量化的过程。
 
 下一节我们将进行第二部分的实验：结合Oracle向量检索的RAG应用。
