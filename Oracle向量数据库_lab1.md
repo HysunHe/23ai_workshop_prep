@@ -13,6 +13,10 @@
   - [实验5：库内向量化操作](#实验5：库内向量化操作)
     - [导入向量嵌入模型](#导入向量嵌入模型)
     - [库内向量化及检索](#库内向量化及检索)
+  - [实验6：与第三方向量嵌入模型集成（演示）](#实验6：与第三方向量嵌入模型集成（演示）)
+    - [开通第三方API服务](#开通第三方API服务)
+    - [创建访问凭证](#创建访问凭证)
+    - [直接在SQL中Embedding](#直接在SQL中Embedding)
   - [总结](#总结)
 
 ## 介绍
@@ -39,7 +43,6 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 2. 有基本的PL/SQL知识，能够看简单的PL/SQL示例代码，能够利用客户端（如sqlplus）等运行提供的PL/SQL示例代码。
 3. 最好有基本的Python知识，能够看懂简单的Python示例代码（非必需）。
 
-
 ## 环境准备
 
 本实验需要的环境，请参考《动手试验环境说明.pdf》中 “参与者”已分配的账号和密码。如user1/user1。
@@ -47,7 +50,6 @@ https://github.com/HysunHe/23ai_workshop_prep/blob/main/Oracle%E5%90%91%E9%87%8F
 例如，连接SQL Developer：
 
 ![sql_developer](image/sql_developer.png)
-
 
 ## 实验1：Oracle向量基本操作
 
@@ -175,7 +177,6 @@ show parameter vector_memory_size;
 
 向量内存池大小估算公式： size of vector pool = 1.3 * number of vectors * number of dimensions * size of vector dimension type
 
-
 #### 向量内存池视图
 
 V$VECTOR_MEMORY_POOL视图包含了向量内存的分配和使用情况。比如：
@@ -190,7 +191,6 @@ GROUP BY CON_ID;
 ```
 
 ![vector_pool_view](image/vector_pool_view.png)
-
 
 #### 创建HNSW索引
 
@@ -209,7 +209,6 @@ WITH TARGET ACCURACY 90;
 https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页)
 https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswparameters?view=azure-node-latest
 
-
 #### 查看索引信息
 
 字典表 VECSYS.VECTOR$INDEX 记录了创建的索引的详细信息：
@@ -219,7 +218,6 @@ SELECT idx_name, JSON_SERIALIZE(IDX_PARAMS returning varchar2 PRETTY) as index_i
 ```
 
 ![view_index_detail](image/view_index_detail.png)
-
 
 #### HNSW 近似检索
 
@@ -386,7 +384,6 @@ curl -X 'POST' \
     2. 点击 "Try it out" 按钮
     3. 在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
     4. 点击 "Execute" 按钮执行。
-    
 
 API 执行完成后，可以查看一下表中的数据：
 
@@ -583,6 +580,65 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
 ![query_with_onnx](image/query_with_onnx.png)
+
+### 实验6：与第三方向量嵌入模型集成（演示）
+
+Oracle数据库向量化操作能支持众多外部提供商提供的API，包括：
+
+* OCIGenAI (Oracle OCI)
+* OpenAI
+* Cohere
+* HuggingFace
+* GoogleAI
+* VertexAI
+* 以及所有能兼容 OpenAI API 规范的其它服务接口。
+
+本节以腾讯混元Embeddings模型为例，演示如何在Oracle中直接用简单的SQL调用腾讯混元Embedding模型，实现数据的向量化。对于其它的API提供商，做法上是一样的。
+
+#### 开通第三方API服务
+
+首先，开通腾讯混元大模型服务，并注册API Key： https://console.cloud.tencent.com/hunyuan/api-key 。
+
+#### 创建访问凭证
+
+利用刚才创建的API Key，在Oracle数据库中创建访问凭证。
+
+```sql
+declare
+  jo json_object_t;
+begin
+  jo := json_object_t();
+  jo.put('access_token', 'sk-IGiJxMkA36gxNiCJ12oncx30BkGw6f7hpMm8cgsQx6aUHeAM');
+  dbms_vector.create_credential(
+    credential_name   => 'HYSUN_HUNYUAN_CRED',
+    params            => json(jo.to_string));
+end;
+/
+```
+
+![create_credential](image/create_credential.png)
+
+
+#### 直接在SQL中Embedding
+
+在SQL中直接调用dbms_vector.utl_to_embedding或dbms_vector.utl_to_embeddings将数据转化为向量：
+
+```sql
+SELECT
+    dbms_vector.utl_to_embedding(
+        'Oracle向量数据库动手实验培训',
+        json('{
+            "provider": "OpenAI",
+            "credential_name": "HYSUN_HUNYUAN_CRED",
+            "url": "https://api.hunyuan.cloud.tencent.com/v1/embeddings",
+            "model": "hunyuan-embedding"
+        }')
+    ) embedding
+FROM dual;
+```
+
+![hunyuan_embedding](image/hunyuan_embedding.png)
+
 
 ## 总结
 
