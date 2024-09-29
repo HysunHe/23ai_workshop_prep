@@ -159,6 +159,39 @@ FETCH FIRST 3 ROWS ONLY;
 
 常见的向量索引有HNSW和IVF两种。
 
+#### 向量内存池
+
+要允许创建向量索引，必须在SGA中启用一块新的内存区域，称为向量内存池。向量内存池用于存储HNSW向量索引和所有相关元数据，以及用于加速IVF索引创建和维护。
+
+向量内存池参数可以由管理员用户进行修改。
+
+![vector_pool](image/vector_pool.png)
+
+```sql
+show parameter vector_memory_size;
+```
+
+![show_vector_pool](image/show_vector_pool.png)
+
+向量内存池大小估算公式： size of vector pool = 1.3 * number of vectors * number of dimensions * size of vector dimension type
+
+
+#### 向量内存池视图
+
+V$VECTOR_MEMORY_POOL视图包含了向量内存的分配和使用情况。比如：
+
+```sql
+SELECT 
+    CON_ID, 
+    sum(alloc_bytes) / 1024 / 1024 as allocated_mb, 
+    sum(USED_BYTES) / 1024 / 1024 as used_mb 
+FROM V$VECTOR_MEMORY_POOL 
+GROUP BY CON_ID;
+```
+
+![vector_pool_view](image/vector_pool_view.png)
+
+
 #### 创建HNSW索引
 
 创建IV索引语句：
@@ -175,6 +208,18 @@ WITH TARGET ACCURACY 90;
 创建 HNSW 索引时，我们可以指定目标准确率 target accuracy，并行执行；还可以指定 HNSW 的参数 M (即 neighbors) 和 efConstruction (如上面注释掉的 Parameters 一行)。关于 HNSW 相关参数的说明可以参考如下文档：
 https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页)
 https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswparameters?view=azure-node-latest
+
+
+#### 查看索引信息
+
+字典表 VECSYS.VECTOR$INDEX 记录了创建的索引的详细信息：
+
+```sql
+SELECT idx_name, JSON_SERIALIZE(IDX_PARAMS returning varchar2 PRETTY) as index_info from VECSYS.VECTOR$INDEX;
+```
+
+![view_index_detail](image/view_index_detail.png)
+
 
 #### HNSW 近似检索
 
