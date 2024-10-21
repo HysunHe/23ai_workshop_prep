@@ -624,6 +624,24 @@ end;
 
 在SQL中直接调用dbms_vector.utl_to_embedding或dbms_vector.utl_to_embeddings将数据转化为向量：
 
+首先，如果当前用户访问API的URL地址不被允许(ACL错误)，则先创建ACE:
+
+```sql
+BEGIN
+    DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
+        host => 'api.hunyuan.cloud.tencent.com',
+        lower_port => 443,
+        upper_port => 443,
+        ace  => xs$ace_type(privilege_list => xs$name_list('http'),
+                             principal_name => '<数据库用户名>',
+                             principal_type => xs_acl.ptype_db)
+   );
+END;
+/
+```
+
+调用混元 API Embedding 服务:
+
 ```sql
 SELECT
     dbms_vector.utl_to_embedding(
