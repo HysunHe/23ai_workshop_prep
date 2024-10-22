@@ -387,6 +387,16 @@ end;
 
 ![pipeline_rag](image/pipeline_rag.png)
 
+
+## 实验5：库内 RAG Demo（仅讲师演示）
+
+Demo链接：http://146.235.226.110:8081/ords/r/hyspoc/apexrag/home 
+用户名/密码：demo/demo123
+相关查找内容样例：
+Oracle Database 19c的升级和迁移方法包括哪些？
+Exadata X10M-2 数据库存储节点硬件配置是什么？
+
+
 ## 总结
 
 至此，我们已经完成了Oracle向量数据库的动手实验第二部分。在本节中，我们重点实现了结合Oracle向量检索的RAG应用。本节中，我们RAG的实现用的是PL/SQL，实际上它是不局限于用哪种编程语言的，比如 Python、Java、Go 等等都可以。

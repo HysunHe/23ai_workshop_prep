@@ -194,7 +194,7 @@ GROUP BY CON_ID;
 
 #### 创建HNSW索引
 
-创建IV索引语句：
+创建索引语句：
 
 ```sql
 CREATE VECTOR INDEX galaxies_hnsw_idx ON galaxies (embedding)
@@ -209,7 +209,7 @@ WITH TARGET ACCURACY 90;
 https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/oracle-ai-vector-search-users-guide.pdf (184页)
 https://learn.microsoft.com/en-us/javascript/api/@azure/search-documents/hnswparameters?view=azure-node-latest
 
-#### 查看索引信息
+#### 查看索引信息 (需要权限，仅讲师展示)
 
 字典表 VECSYS.VECTOR$INDEX 记录了创建的索引的详细信息：
 
@@ -246,7 +246,7 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 drop index galaxies_hnsw_idx;
 ```
 
-创建IV索引语句：
+创建IVF索引语句：
 
 ```sql
 CREATE VECTOR INDEX galaxies_ivf_idx ON galaxies(embedding)
@@ -394,8 +394,8 @@ API 执行完成后，可以查看一下表中的数据：
 select count(*) from lab_vecstore;  
 
 -- 查看数据
-select json_value(cmetadata, '$.source') as src_file, embedding as embedding 
-from lab_vecstore;
+select t.cmetadata.source as src_file, embedding as embedding 
+from lab_vecstore t;
 ```
 
 ![data_prepare_check](image/data_prepare_check.png)
