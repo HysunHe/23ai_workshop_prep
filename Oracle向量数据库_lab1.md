@@ -368,7 +368,7 @@ CREATE TABLE lab_vecstore (
 
 ```shell
 curl -X 'POST' \
-    'http://10.113.121.221:8099/workshop/prepare-data' \
+    'http://<ODA数据库IP>:8099/workshop/prepare-data' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -381,7 +381,7 @@ curl -X 'POST' \
 
 注：如果没安装curl等api调用工具，也可以通过如下界面的方式执行：
 
-1. 打开链接 http://10.113.121.221:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
+1. 打开链接http://<ODA数据库IP>:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
 2. 点击 "Try it out" 按钮
 3. 在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
 4. 点击 "Execute" 按钮执行。
