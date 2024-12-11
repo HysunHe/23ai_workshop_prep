@@ -306,6 +306,8 @@ pip install -r requirements.txt
 # 下载源码
 git clone https://github.com/HysunHe/23ai_workshop_prep
 
+# 编辑 app.env 文件修改配置
+
 # 启动模型
 cd 23ai_workshop_prep
 
