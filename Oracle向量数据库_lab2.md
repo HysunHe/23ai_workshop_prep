@@ -92,7 +92,7 @@ pip install vllm-flash-attn
 启动运行：
 
 ```shell
- nohup python -u -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048 > vllm.out 2>&1 &
+ nohup python -u -m vllm.entrypoints.openai.api_server --port 8098 --model /home/ubuntu/ChatGPT/Models/Qwen/Qwen2-7B-Instruct  --served-model-name Qwen2-7B-Instruct --device=cuda --dtype auto --max-model-len=2048 --gpu_memory_utilization=0.95 > vllm.out 2>&1 &
 ```
 
 ### 测试部署
