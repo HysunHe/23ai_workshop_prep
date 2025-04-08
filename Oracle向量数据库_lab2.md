@@ -142,7 +142,7 @@ begin
         ]
     }';
   
-    -- 第二步：调用大语言模型，生成RAG结果
+    -- 第二步：直接调用大语言模型，生成结果
     l_clob := apex_web_service.make_rest_request(
         p_url => 'http://146.235.226.110:8098/v1/chat/completions',
         p_http_method => 'POST',
