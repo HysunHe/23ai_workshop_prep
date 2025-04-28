@@ -372,6 +372,9 @@ begin
     }';
   
     -- 第三步：调用大语言模型，生成RAG结果
+    apex_web_service.g_request_headers(1).name :=  'Content-Type';
+    apex_web_service.g_request_headers(1).value := 'application/json';
+    
     l_clob := apex_web_service.make_rest_request(
         p_url => 'http://146.235.226.110:8098/v1/chat/completions',
         p_http_method => 'POST',
