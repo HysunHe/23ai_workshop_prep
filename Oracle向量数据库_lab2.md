@@ -393,7 +393,7 @@ end;
 
 ## 实验5：库内 RAG Demo（仅讲师演示）
 
-Demo链接：http://146.235.226.110:8081/ords/r/hyspoc/apexrag/home 
+Demo链接：http://132.145.81.123:8080/ords/r/hyspoc/apexrag/home 
 用户名/密码：demo/demo123
 相关查找内容样例：
 Oracle Database 19c的升级和迁移方法包括哪些？
