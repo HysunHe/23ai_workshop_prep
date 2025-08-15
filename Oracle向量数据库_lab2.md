@@ -86,7 +86,6 @@ conda activate vllm
 
 # 安装vllm依赖包
 pip install vllm
-pip install vllm-flash-attn
 ```
 
 启动运行：
