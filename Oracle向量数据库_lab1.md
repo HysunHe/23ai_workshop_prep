@@ -366,24 +366,26 @@ CREATE TABLE lab_vecstore (
 
 源数据集：讲师展示源数据集。
 
-接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中）：
+接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中），可以用命令行方式，也可以用界面方式。
 
+#### 命令行方式
 ```shell
 curl -X 'POST' \
-    'http://<ODA数据库IP>:8099/workshop/prepare-data' \
+    'http://140.238.14.161:8099/workshop/prepare-data' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
-        "db_user": "<userx>",
-        "db_password": "<password>",
+        "db_user": "你的数据库用户名userxx",
+        "db_password": "数据库用户对应的密码",
         "table_name": "lab_vecstore",
         "dataset_name": "oracledb_docs"
     }'
 ```
 
+#### 界面方式
 注：如果没安装curl等api调用工具，也可以通过如下界面的方式执行：
 
-1. 打开链接http://<ODA数据库IP>:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
+1. 打开链接http://140.238.14.161:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
 2. 点击 "Try it out" 按钮
 3. 在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
 4. 点击 "Execute" 按钮执行。
