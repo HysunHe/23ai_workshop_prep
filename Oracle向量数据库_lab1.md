@@ -279,76 +279,24 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![galaxies_ivf_search_exec_plan](image/galaxies_ivf_search_exec_plan.png)
 
-## 实验3：部署向量嵌入模型（仅讲师操作）
-
-**此节内容仅讲师动手操作及讲解。**
+## 实验3：数据集加载
 
 以上我们介绍了向量的基本操作。在上面的例子中，我们的向量数据是手工造的，向量的维度也很小。那么，在现实环境中，向量数据是如何来的？答案是向量嵌入模型。
 
 在本实验中，我们将使用开源的向量嵌入模型 text2vec-large-chinese
 
-### 向量嵌入模型部署
+### 数据集介绍（仅讲师）
 
-考虑到硬件资源因素，没有足够的资源让每个人都部署一份模型，因此，本操作仅由讲师完成。讲师将向量嵌入模型部分为REST API 的方式，供大家调用；同时展示源代码并讲解。
+讲师介绍需要加载的数据集；同时介绍数据集加载程序的源代码并讲解。
 
 源代码：https://github.com/HysunHe/23ai_workshop_prep
 
-```shell
-# 创建Python环境
-conda create -n ws23ai python=3.12
 
-# 进入新创建的Python环境
-conda activate ws23ai
+### 库外向量化操作
 
-# 安装依赖
-pip install -r requirements.txt
+#### 数据向量化及加载入库
 
-# 下载源码
-git clone https://github.com/HysunHe/23ai_workshop_prep
-
-# 编辑 app.env 文件修改配置
-
-# 启动模型
-cd 23ai_workshop_prep
-
-nohup python -u main.py > lab.out 2>&1 &
-```
-
-### 向量嵌入模型访问
-
-向量嵌入模型部署完成后，就可以根据提供的REST API进行访问了。提供了如下两个API：
-
-1. 文本向量化API（后续将用到）
-
-   ```shell
-    curl -X 'POST' \
-    'http://<ip>:<port>/workshop/embedding' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-        "text": "<需要向量化的文本>"
-    }'
-   ```
-2. 批量数据准备API（后续将用到）
-
-   ```shell
-   curl -X 'POST' \
-    'http://<ip>:<port>/workshop/prepare-data' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-        "db_user": "<数据库用户名>",
-        "db_password": "<数据库用户密码>",
-        "table_name": "<表名>",
-        "dataset_name": "<数据集名称>"
-    }'
-   ```
-
-## 实验4：库外向量化操作
-
-### 数据加载
-
-库外向量化指源数据由外部程序向量化之后，再插入或加载到数据库表中。在本例中，我们将使用 Python 程序将文本数据向量化之后，再调用Oracle客户包将数据插入到数据库中。这是常用的一种方法，操作方式也与平时的数据加载操作一致。
+库外向量化指源数据由外部程序向量化之后，再插入或加载到数据库表中。在本例中，我们将使用 Python 程序将文本数据向量化之后，再调用Oracle客户包将数据插入到数据库中。这是常用的一种方法。
 
 为了让接下来的实验更接近真实场景，我们将创建另一张表 lab_vecstore：
 
@@ -364,31 +312,30 @@ CREATE TABLE lab_vecstore (
 
 这里我们没有指定向量的维度，但指定了数据类型格式是 FLOAT32，与向量模型的输出一致。下面我们将源数据文件（源数据集）加载进lab_vecstore表。
 
-源数据集：讲师展示源数据集。
 
-接下来，请调用 批量数据准备API（API 会将上述源数据集进行向量化之后，再插入到数据库中），可以用命令行方式，也可以用界面方式。
+- 打开如下链接 
+http://140.238.14.161:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post 
 
-#### 命令行方式
-```shell
-curl -X 'POST' \
-    'http://140.238.14.161:8099/workshop/prepare-data' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-        "db_user": "你的数据库用户名userxx",
-        "db_password": "数据库用户对应的密码",
-        "table_name": "lab_vecstore",
-        "dataset_name": "oracledb_docs"
-    }'
-```
+![alt text](image/dataload_step1.png)
 
-#### 界面方式
-注：如果没安装curl等api调用工具，也可以通过如下界面的方式执行：
 
-1. 打开链接http://140.238.14.161:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post
-2. 点击 "Try it out" 按钮
-3. 在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
-4. 点击 "Execute" 按钮执行。
+- 点击 "Try it out" 按钮，在Request body中并输入 *** 分配给自己的用户名及密码 ***：
+
+![alt text](image/dataload_step2.png)
+
+
+-  在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
+
+![alt text](image/dataload_step3.png)
+
+
+- 点击 "Execute" 按钮执行。
+
+![alt text](image/dataload_step4.png)
+
+
+**注意**：不要点击多次 Execute，以免加载重复数据。
+
 
 
 API 执行完成后，可以查看一下表中的数据：
@@ -406,7 +353,7 @@ from lab_vecstore t;
 
 至此，源数据集已经向量化完成，并且成功入库了。（讲师展示并讲解外部向量化的源代码）
 
-### 向量检索
+### 使用库外向量化方式检索内容
 
 本实验中，我们使用 “Oracle 23ai 新特性” 这个文本进行相似度检索。
 
@@ -415,7 +362,7 @@ from lab_vecstore t;
 ```sql
 -- 第一步：向量化用户问题
 select apex_web_service.make_rest_request(
-    p_url => 'http://146.235.226.110:8099/workshop/embedding',
+    p_url => 'http://127.0.0.1:8099/workshop/embedding',
     p_http_method => 'POST',
     p_body => '{ "text": "Oracle 23ai 新特性" }'
 );
@@ -441,7 +388,7 @@ begin
   
     -- 第一步：向量化用户问题
     l_clob := apex_web_service.make_rest_request(
-        p_url => 'http://146.235.226.110:8099/workshop/embedding',
+        p_url => 'http://127.0.0.1:8099/workshop/embedding',
         p_http_method => 'POST',
         p_body => l_input
     );
@@ -587,6 +534,9 @@ FETCH APPROX FIRST 3 ROWS ONLY;
 
 ![query_with_onnx](image/query_with_onnx.png)
 
+跟 【使用库外向量化方式检索内容】一节相比，完成同样的功能，本节利用库内向量化的方式，只需要一条简单的 SQL即可完成。
+
+
 ## 实验6：与第三方向量嵌入模型服务集成（演示）
 
 Oracle数据库向量化操作能支持众多外部提供商提供的API，包括：
@@ -599,24 +549,20 @@ Oracle数据库向量化操作能支持众多外部提供商提供的API，包�
 * VertexAI
 * 以及所有能兼容 OpenAI API 规范的其它服务接口。
 
-本节以腾讯混元Embeddings模型为例，演示如何在Oracle中直接用简单的SQL调用腾讯混元Embedding模型，实现数据的向量化。对于其它的API提供商，做法上是一样的。
+本节以阿里云Embeddings服务为例，演示如何在Oracle中直接用简单的SQL调用阿里云Embedding API 服务，实现数据的向量化。对于其它的API提供商，做法上是一样的。
 
-### 开通第三方API服务
 
-首先，开通腾讯混元大模型服务，并注册API Key： https://console.cloud.tencent.com/hunyuan/api-key 。
+### 创建访问凭证 (仅讲师操作)
 
-### 创建访问凭证
-
-利用刚才创建的API Key，在Oracle数据库中创建访问凭证。
-
+利用服务提供商的API Key，在Oracle数据库中创建访问凭证。
 ```sql
 declare
   jo json_object_t;
 begin
   jo := json_object_t();
-  jo.put('access_token', 'sk-IGiJxMkAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+  jo.put('access_token', 'sk-75229e7e569449129dsss5eedxxxxx');
   dbms_vector.create_credential(
-    credential_name   => 'HYSUN_HUNYUAN_CRED',
+    credential_name   => 'HYSUN_ALI_CRED',
     params            => json(jo.to_string));
 end;
 /
@@ -631,9 +577,10 @@ end;
 首先，如果当前用户访问API的URL地址不被允许(ACL错误)，则先创建ACE:
 
 ```sql
+-- 这里需要DBA 权限，仅讲师操作
 BEGIN
     DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
-        host => 'api.hunyuan.cloud.tencent.com',
+        host => 'dashscope.aliyuncs.com',
         lower_port => 443,
         upper_port => 443,
         ace  => xs$ace_type(privilege_list => xs$name_list('http'),
@@ -644,20 +591,18 @@ END;
 /
 ```
 
-调用混元 API Embedding 服务:
+调用阿里 Embedding API 服务:
 
 ```sql
-SELECT
-    dbms_vector.utl_to_embedding(
-        'Oracle向量数据库动手实验培训',
-        json('{
-            "provider": "OpenAI",
-            "credential_name": "HYSUN_HUNYUAN_CRED",
-            "url": "https://api.hunyuan.cloud.tencent.com/v1/embeddings",
-            "model": "hunyuan-embedding"
-        }')
-    ) embedding
-FROM dual;
+SELECT dbms_vector.utl_to_embedding(
+    'Oracle向量数据库动手实验培训',
+    json('{
+        "provider": "OpenAI",
+        "credential_name": "HYSUN_ALI_CRED",
+        "url": "https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings",
+        "model": "text-embedding-v3"
+    }')
+);
 ```
 
 ![hunyuan_embedding](image/hunyuan_embedding.png)
@@ -672,4 +617,3 @@ FROM dual;
 
 最后，我们还介绍了如何通过与第三方Embedding API服务集成，在SQL中调用第三方服务完成向量化的过程。
 
-下一节我们将进行第二部分的实验：结合Oracle向量检索的RAG应用。
