@@ -313,15 +313,11 @@ CREATE TABLE lab_vecstore (
 这里我们没有指定向量的维度，但指定了数据类型格式是 FLOAT32，与向量模型的输出一致。下面我们将源数据文件（源数据集）加载进lab_vecstore表。
 
 
-- 打开如下链接 
+- 打开如下链接，点击 "Try it out" 按钮  
+
 http://140.238.14.161:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post 
 
 ![alt text](image/dataload_step1.png)
-
-
-- 点击 "Try it out" 按钮，在Request body中并输入 *** 分配给自己的用户名及密码 ***：
-
-![alt text](image/dataload_step2.png)
 
 
 -  在 "Request body" 输入框中，输入分配给你的 db_user 和 db_password 参数
