@@ -1,5 +1,5 @@
-问题： Oracle 23ai 有哪些新特性？
-解答： Oracle 23ai 发布了数百个新特性，尤其是在AI方面和提高开发人员生产力方面。以下列出一些重大的特性：
+问题： Oracle 26ai 有哪些新特性？
+解答： Oracle 26ai 发布了数百个新特性，尤其是在AI方面和提高开发人员生产力方面。以下列出一些重大的特性：
 - AI向量检索（向量数据库）
 - JSON二元性视图 (JSON Duality Views)
 - True Cache
