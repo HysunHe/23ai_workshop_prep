@@ -94,7 +94,7 @@ SELECT VECTOR_DISTANCE( vector('[2,2]'), vector('[5,5]'), COSINE) as distance;
 
 ### 向量类型字段及样例表
 
-Oracle 23ai 引入了向量数据类型：VECTOR (dimentions, format)，该类型可指定两个参数，第一个是向量的维度，如 [2,2] 是一个二维向量；第二个是数据格式，如 FLOAT32。也可以不指定。
+Oracle 26ai 引入了向量数据类型：VECTOR (dimentions, format)，该类型可指定两个参数，第一个是向量的维度，如 [2,2] 是一个二维向量；第二个是数据格式，如 FLOAT32。也可以不指定。
 
 建立一个测试表 galaxies:
 
@@ -351,7 +351,7 @@ from lab_vecstore t;
 
 ### 使用库外向量化方式检索内容
 
-本实验中，我们使用 “Oracle 23ai 新特性” 这个文本进行相似度检索。
+本实验中，我们使用 “Oracle 26ai 新特性” 这个文本进行相似度检索。
 
 第一步，先将要检索的文本在库外向量化。我们调用上述提供的API完成这一步。API将返回向量数据。
 
@@ -360,7 +360,7 @@ from lab_vecstore t;
 select apex_web_service.make_rest_request(
     p_url => 'http://127.0.0.1:8099/workshop/embedding',
     p_http_method => 'POST',
-    p_body => '{ "text": "Oracle 23ai 新特性" }'
+    p_body => '{ "text": "Oracle 26ai 新特性" }'
 );
 ```
 
@@ -372,7 +372,7 @@ select apex_web_service.make_rest_request(
 set serveroutput on;
 
 declare
-    l_question varchar2(500) := 'Oracle 23ai 新特性';
+    l_question varchar2(500) := 'Oracle 26ai 新特性';
     l_input CLOB;
     l_clob  CLOB;
     j apex_json.t_values;
@@ -487,7 +487,7 @@ CREATE TABLE lab_vecstore2 (
 insert into lab_vecstore2(dataset_name, document, cmetadata)
 select dataset_name, document, cmetadata 
 from lab_vecstore  --
-where json_value(cmetadata, '$.source') like '%202408_23ai%';
+where json_value(cmetadata, '$.source') like '%26ai%';
 commit;
 
 select * from lab_vecstore2;
@@ -524,7 +524,7 @@ select document,
   json_value(cmetadata, '$.source') as src_file
 from lab_vecstore2
 where dataset_name='oracledb_docs'
-order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 23ai 新特性' as data), COSINE)
+order by VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(mydoc_model USING 'Oracle 26ai 新特性' as data), COSINE)
 FETCH APPROX FIRST 3 ROWS ONLY;
 ```
 
