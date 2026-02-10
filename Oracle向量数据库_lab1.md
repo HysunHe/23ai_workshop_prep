@@ -315,7 +315,7 @@ CREATE TABLE lab_vecstore (
 
 - 打开如下链接，点击 "Try it out" 按钮  
 
-http://140.238.14.161:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post 
+http://130.162.159.42:8099/workshop/docs#/default/prepare_data_workshop_prepare_data_post 
 
 ![alt text](image/dataload_step1.png)
 
